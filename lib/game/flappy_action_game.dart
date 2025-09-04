@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
@@ -7,6 +9,7 @@ import 'package:flappy_action/components/birds/enemy.dart';
 import 'package:flappy_action/components/birds/flappy_bird.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
+import 'package:flutter/material.dart';
 
 class FlappyActionGame extends FlameGame {
   @override
@@ -20,6 +23,7 @@ class FlappyActionGame extends FlameGame {
     // size: Vector2.all(50),
     position: size / 2,
     animationTime: 0.12,
+    joystick: joystick,
   );
 
   late final Bird enemy = Enemy(
@@ -28,14 +32,36 @@ class FlappyActionGame extends FlameGame {
     animationTime: 0.12,
   );
 
+  late final JoystickComponent joystick;
+
   @override
   void onLoad() async {
     await images.loadAll([SpriteUtil.spriteSheet]);
     Flame.device.setPortraitUpOnly(); // lock to portrait
     GameUtil.initialize(deviceSize: size);
 
-    addComponentsToWorld();
+    // Create joystick after GameUtil is initialized
+    joystick = JoystickComponent(
+      position: Vector2(
+        GameUtil.right -
+            GameUtil.getRelativeX(1.5), // 1.5 grid units from right
+        GameUtil.bottom -
+            GameUtil.getRelativeY(1.5), // 1.5 grid units from bottom
+      ),
+      knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.white),
+      background: CircleComponent(
+        radius: 50,
+        paint: Paint()..color = Colors.black.withAlpha(100),
+      ),
+      size: 100,
+      anchor: Anchor.center,
+    );
+
     addAll([world, cameraComponent]);
+
+    addComponentsToViewport();
+
+    addComponentsToWorld();
   }
 
   void addComponentsToWorld() {
@@ -43,6 +69,14 @@ class FlappyActionGame extends FlameGame {
       Background(size: size, position: Vector2(0, 0), animationTime: 30),
       player,
       enemy,
+      // Remove joystick from here
     ]);
   }
+
+  void addComponentsToViewport() {
+    cameraComponent.viewport.add(joystick);
+  }
+
+  // @override
+  // bool get debugMode => true;
 }
