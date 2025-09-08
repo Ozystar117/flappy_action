@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flappy_action/components/background.dart';
@@ -11,7 +12,7 @@ import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 
-class FlappyActionGame extends FlameGame {
+class FlappyActionGame extends FlameGame with TapCallbacks {
   @override
   final World world = World();
 
@@ -75,6 +76,11 @@ class FlappyActionGame extends FlameGame {
 
   void addComponentsToViewport() {
     cameraComponent.viewport.add(joystick);
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    (player as FlappyBird).jump();
   }
 
   // @override
