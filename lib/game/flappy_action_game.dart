@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
@@ -8,6 +6,7 @@ import 'package:flappy_action/components/background.dart';
 import 'package:flappy_action/components/birds/bird.dart';
 import 'package:flappy_action/components/birds/enemy.dart';
 import 'package:flappy_action/components/birds/flappy_bird.dart';
+import 'package:flappy_action/components/obstacles/pipe_spawner.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ class FlappyActionGame extends FlameGame with TapCallbacks {
     ..viewfinder.anchor = Anchor.topLeft;
 
   late final Bird player = FlappyBird(
-    size: GameUtil.getRelativeSize(0.7, 0.7),
+    size: GameUtil.getRelativeSizeX(0.7),
     // size: Vector2.all(50),
     position: size / 2,
     animationTime: 0.12,
@@ -28,7 +27,7 @@ class FlappyActionGame extends FlameGame with TapCallbacks {
   );
 
   late final Bird enemy = Enemy(
-    size: GameUtil.getRelativeSize(0.7, 0.7),
+    size: GameUtil.getRelativeSizeX(0.7),
     position: GameUtil.getRelativePosition(3, 3),
     animationTime: 0.12,
   );
@@ -66,11 +65,14 @@ class FlappyActionGame extends FlameGame with TapCallbacks {
   }
 
   void addComponentsToWorld() {
+    // PipePair pipePair = PipePair(position: Vector2(size.x / 2, 0));
+    PipeSpawner pipeSpawner = PipeSpawner();
+
     world.addAll([
       Background(size: size, position: Vector2(0, 0), animationTime: 30),
       player,
       enemy,
-      // Remove joystick from here
+      pipeSpawner,
     ]);
   }
 

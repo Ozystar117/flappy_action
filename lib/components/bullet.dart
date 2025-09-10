@@ -39,9 +39,9 @@ class Bullet extends RectangleComponent with HasGameReference {
     position += velocity * dt;
 
     // Remove bullet if it goes off screen
-    if (position.x < -size.x ||
+    if (position.x < -size.x / 2 ||
         position.x > GameUtil.width + size.x ||
-        position.y < -size.y ||
+        position.y < 0 ||
         position.y > GameUtil.height + size.y) {
       removeFromParent();
     }

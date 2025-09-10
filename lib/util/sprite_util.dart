@@ -7,7 +7,7 @@ class SpriteUtil {
 
   static Sprite backgroundDaySprite = getSprite(0, 0, 144, 256);
   static Sprite backgroundNightSprite = getSprite(146, 0, 144, 256);
-  
+
   static Sprite yellowBird1 = getSprite(3, 491, 17, 12);
   static Sprite yellowBird2 = getSprite(31, 491, 17, 12);
   static Sprite yellowBird3 = getSprite(59, 491, 17, 12);
@@ -15,6 +15,12 @@ class SpriteUtil {
   static Sprite redBird1 = getSprite(115, 381, 17, 12);
   static Sprite redBird2 = getSprite(115, 407, 17, 12);
   static Sprite redBird3 = getSprite(115, 433, 17, 12);
+
+  // static Sprite redTopTube = getSprite(0, 323, 26, 160);
+  // static Sprite redBottomTube = getSprite(28, 323, 26, 160);
+
+  static Sprite greenTopTube = getSprite(56, 323, 26, 160);
+  // static Sprite greenBottomTube = getSprite(0, 323, 56, 160);
 
   static Sprite getSprite(double x, double y, double width, double height) {
     return Sprite(
