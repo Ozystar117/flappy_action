@@ -40,8 +40,8 @@ class FlappyBird extends Bird with HasGameReference {
   @override
   update(double dt) {
     // Prevent the bird from going off the screen: to be removed
-    if (position.y > GameUtil.grid * 10) {
-      position.y = GameUtil.grid * 10;
+    if (position.y > GameUtil.getRelativeY(5)) {
+      position.y = GameUtil.getRelativeY(5);
     }
     velocity.y += gravity * dt;
     position.y += velocity.y * dt;
@@ -60,7 +60,7 @@ class FlappyBird extends Bird with HasGameReference {
   }
 
   void jump() {
-    velocity.y = -GameUtil.getRelativeHeight(3);
+    velocity.y = -GameUtil.getRelativeHeight(1.5);
   }
 
   void shoot() {
