@@ -73,7 +73,7 @@ class FlappyBird extends Bird with HasGameReference {
       final bullet = Bullet(
         position: position.clone(), // Bullet comes from center of bird
         direction: bulletDirection,
-        speed: GameUtil.getRelativeX(10),
+        speed: GameUtil.getRelativeX(15),
       );
 
       // Add bullet to the world
