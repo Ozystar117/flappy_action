@@ -4,7 +4,6 @@ import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flappy_action/components/background.dart';
 import 'package:flappy_action/components/birds/bird.dart';
-import 'package:flappy_action/components/birds/enemy.dart';
 import 'package:flappy_action/components/birds/flappy_bird.dart';
 import 'package:flappy_action/components/obstacles/pipe_spawner.dart';
 import 'package:flappy_action/util/gameUtil.dart';
@@ -24,12 +23,6 @@ class FlappyActionGame extends FlameGame with TapCallbacks {
     position: size / 2,
     animationTime: 0.12,
     joystick: joystick,
-  );
-
-  late final Bird enemy = Enemy(
-    size: GameUtil.getRelativeSizeX(0.7),
-    position: GameUtil.getRelativePosition(3, 3),
-    animationTime: 0.12,
   );
 
   late final JoystickComponent joystick;
@@ -71,7 +64,6 @@ class FlappyActionGame extends FlameGame with TapCallbacks {
     world.addAll([
       Background(size: size, position: Vector2(0, 0), animationTime: 30),
       player,
-      enemy,
       pipeSpawner,
     ]);
   }
