@@ -3,11 +3,14 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flappy_action/components/birds/bird.dart';
+import 'package:flappy_action/components/birds/enemy.dart';
 import 'package:flappy_action/components/bullet.dart';
+import 'package:flappy_action/components/obstacles/pipe.dart';
+import 'package:flappy_action/game/flappy_action_game.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 
-class FlappyBird extends Bird with HasGameReference {
+class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   late final JoystickComponent joystick;
 
   late Vector2 velocity = Vector2.all(0);
@@ -39,9 +42,9 @@ class FlappyBird extends Bird with HasGameReference {
 
   @override
   update(double dt) {
-    // Prevent the bird from going off the screen: to be removed
-    if (position.y > GameUtil.getRelativeY(5)) {
-      position.y = GameUtil.getRelativeY(5);
+    if (position.y > GameUtil.bottom - size.y / 2) {
+      game.isGameOver = true;
+      return;
     }
     velocity.y += gravity * dt;
     position.y += velocity.y * dt;
@@ -57,6 +60,17 @@ class FlappyBird extends Bird with HasGameReference {
     }
 
     super.update(dt);
+  }
+
+  @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    super.onCollisionStart(intersectionPoints, other);
+    if (other is Enemy || other is Pipe) {
+      game.isGameOver = true;
+    }
   }
 
   void jump() {
