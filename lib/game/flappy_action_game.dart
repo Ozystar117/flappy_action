@@ -6,6 +6,7 @@ import 'package:flappy_action/components/background.dart';
 import 'package:flappy_action/components/birds/bird.dart';
 import 'package:flappy_action/components/birds/flappy_bird.dart';
 import 'package:flappy_action/components/obstacles/pipe_spawner.dart';
+import 'package:flappy_action/components/score_display.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,8 @@ class FlappyActionGame extends FlameGame
   late final JoystickComponent joystick;
 
   final PipeSpawner pipeSpawner = PipeSpawner();
+
+  late final ScoreDisplay scoreDisplay = ScoreDisplay();
 
   bool isGameOver = false;
 
@@ -74,6 +77,7 @@ class FlappyActionGame extends FlameGame
 
   void addComponentsToViewport() {
     cameraComponent.viewport.add(joystick);
+    cameraComponent.viewport.add(scoreDisplay);
   }
 
   @override
