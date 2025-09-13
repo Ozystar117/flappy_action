@@ -10,7 +10,8 @@ import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 
-class FlappyActionGame extends FlameGame with TapCallbacks {
+class FlappyActionGame extends FlameGame
+    with TapCallbacks, HasCollisionDetection {
   @override
   final World world = World();
 

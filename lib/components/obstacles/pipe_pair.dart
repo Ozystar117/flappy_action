@@ -52,7 +52,10 @@ class PipePair extends PositionComponent {
     enemy.position.x = position.x;
 
     if (topPipe.position.x < -topPipe.size.x) {
-      parent!.removeAll([topPipe, bottomPipe, enemy]);
+      parent!.removeAll([topPipe, bottomPipe]);
+      if (enemy.parent != null) {
+        enemy.removeFromParent();
+      }
       removeFromParent();
     }
   }
