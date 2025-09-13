@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-class Bird extends SpriteAnimationComponent {
+abstract class Bird extends SpriteAnimationComponent with CollisionCallbacks {
   final double animationTime;
   late final List<Sprite> sprites;
 
@@ -16,5 +17,7 @@ class Bird extends SpriteAnimationComponent {
   FutureOr<void> onLoad() {
     anchor = Anchor.center;
     animation = SpriteAnimation.spriteList(sprites, stepTime: animationTime);
+
+    add(CircleHitbox());
   }
 }

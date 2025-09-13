@@ -28,6 +28,10 @@ class FlappyActionGame extends FlameGame
 
   late final JoystickComponent joystick;
 
+  final PipeSpawner pipeSpawner = PipeSpawner();
+
+  bool isGameOver = false;
+
   @override
   void onLoad() async {
     await images.loadAll([SpriteUtil.spriteSheet]);
@@ -60,7 +64,6 @@ class FlappyActionGame extends FlameGame
 
   void addComponentsToWorld() {
     // PipePair pipePair = PipePair(position: Vector2(size.x / 2, 0));
-    PipeSpawner pipeSpawner = PipeSpawner();
 
     world.addAll([
       Background(size: size, position: Vector2(0, 0), animationTime: 30),
@@ -76,6 +79,14 @@ class FlappyActionGame extends FlameGame
   @override
   void onTapUp(TapUpEvent event) {
     (player as FlappyBird).jump();
+  }
+
+  @override
+  void update(double dt) {
+    if (isGameOver) {
+      return;
+    }
+    super.update(dt);
   }
 
   // @override
