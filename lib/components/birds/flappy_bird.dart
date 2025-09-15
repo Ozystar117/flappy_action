@@ -43,8 +43,9 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   @override
   update(double dt) {
     if (position.y > GameUtil.bottom - size.y / 2) {
-      game.isGameOver = true;
-      return;
+      // game.isGameOver = true;
+      game.gameOver();
+      // return;
     }
     velocity.y += gravity * dt;
     position.y += velocity.y * dt;
@@ -69,7 +70,8 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   ) {
     super.onCollisionStart(intersectionPoints, other);
     if (other is Enemy || other is Pipe) {
-      game.isGameOver = true;
+      // game.isGameOver = true;
+      game.gameOver();
     }
   }
 

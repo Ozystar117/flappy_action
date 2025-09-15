@@ -60,6 +60,7 @@ class SpriteUtil {
   static Sprite playButton = getSprite(354, 118, 52, 29);
   static Sprite flappyBirdText = getSprite(351, 91, 89, 24);
   static Sprite tapSprite = getSprite(292, 91, 57, 65);
+  static Sprite pauseButtonSprite = getSprite(121, 306, 13, 14);
 
   // GET SPRITE FROM SPRITE SHEET
   static Sprite getSprite(double x, double y, double width, double height) {
