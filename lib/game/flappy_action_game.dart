@@ -17,27 +17,31 @@ class FlappyActionGame extends FlameGame
   @override
   final World world = World();
 
-  late final CameraComponent cameraComponent = CameraComponent(world: world)
+  late CameraComponent cameraComponent = CameraComponent(world: world)
     ..viewfinder.anchor = Anchor.topLeft;
 
-  late final Bird player = FlappyBird(
-    size: GameUtil.getRelativeSizeX(0.7),
-    // size: Vector2.all(50),
-    position: size / 2,
-    animationTime: 0.12,
-    joystick: joystick,
-  );
+  late Bird player;
 
-  late final JoystickComponent joystick;
+  late JoystickComponent joystick;
 
   final PipeSpawner pipeSpawner = PipeSpawner();
 
-  late final ScoreDisplay scoreDisplay = ScoreDisplay();
+  late ScoreDisplay scoreDisplay;
 
-  late final PauseButton pauseButton = PauseButton();
+  late PauseButton pauseButton = PauseButton();
 
   bool isGameOver = false;
   bool isGameStarted = false;
+
+  void initForRestart() {
+    player = FlappyBird(
+      size: GameUtil.getRelativeSizeX(0.7),
+      position: size / 2,
+      animationTime: 0.12,
+      joystick: joystick,
+    );
+    scoreDisplay = ScoreDisplay();
+  }
 
   @override
   void onLoad() async {
@@ -53,14 +57,19 @@ class FlappyActionGame extends FlameGame
         GameUtil.bottom -
             GameUtil.getRelativeY(1.5), // 1.5 grid units from bottom
       ),
-      knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.white),
-      background: CircleComponent(
-        radius: 50,
-        paint: Paint()..color = Colors.black.withAlpha(100),
+      knob: CircleComponent(
+        radius: GameUtil.getRelativeX(1),
+        paint: Paint()..color = Colors.white,
       ),
-      size: 100,
+      background: CircleComponent(
+        radius: GameUtil.getRelativeX(1.5),
+        paint: Paint()..color = Colors.black.withAlpha(10),
+      ),
+      size: GameUtil.getRelativeWidth(1.5),
       anchor: Anchor.center,
     );
+
+    initForRestart();
 
     addAll([world, cameraComponent]);
 
@@ -93,8 +102,23 @@ class FlappyActionGame extends FlameGame
   }
 
   void gameOver() {
-    // overlays.add('gameOverMenu'); // todo: add game over screen
+    overlays.add('gameOverMenu'); // todo: add game over screen
     pauseEngine();
+  }
+
+  void restart() {
+    // isGameOver = false;
+
+    world.removeAll(world.children);
+    cameraComponent.viewport.removeAll(cameraComponent.viewport.children);
+
+    initForRestart();
+
+    addComponentsToWorld();
+    addComponentsToViewport();
+
+    overlays.remove('gameOverMenu');
+    resumeEngine();
   }
 
   // @override
