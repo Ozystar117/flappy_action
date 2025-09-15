@@ -34,6 +34,7 @@ class FlappyActionGame extends FlameGame
   late final ScoreDisplay scoreDisplay = ScoreDisplay();
 
   bool isGameOver = false;
+  bool isGameStarted = false;
 
   @override
   void onLoad() async {
@@ -87,7 +88,7 @@ class FlappyActionGame extends FlameGame
 
   @override
   void update(double dt) {
-    if (isGameOver) {
+    if (isGameOver || !isGameStarted) {
       return;
     }
     super.update(dt);
