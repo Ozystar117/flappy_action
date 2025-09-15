@@ -5,8 +5,9 @@ import 'package:flame/game.dart';
 import 'package:flappy_action/components/background.dart';
 import 'package:flappy_action/components/birds/bird.dart';
 import 'package:flappy_action/components/birds/flappy_bird.dart';
+import 'package:flappy_action/components/huds/pause_button.dart';
 import 'package:flappy_action/components/obstacles/pipe_spawner.dart';
-import 'package:flappy_action/components/score_display.dart';
+import 'package:flappy_action/components/huds/score_display.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,8 @@ class FlappyActionGame extends FlameGame
   final PipeSpawner pipeSpawner = PipeSpawner();
 
   late final ScoreDisplay scoreDisplay = ScoreDisplay();
+
+  late final PauseButton pauseButton = PauseButton();
 
   bool isGameOver = false;
   bool isGameStarted = false;
@@ -64,6 +67,8 @@ class FlappyActionGame extends FlameGame
     addComponentsToViewport();
 
     addComponentsToWorld();
+
+    pauseEngine();
   }
 
   void addComponentsToWorld() {
@@ -79,6 +84,7 @@ class FlappyActionGame extends FlameGame
   void addComponentsToViewport() {
     cameraComponent.viewport.add(joystick);
     cameraComponent.viewport.add(scoreDisplay);
+    cameraComponent.viewport.add(pauseButton);
   }
 
   @override
@@ -86,13 +92,18 @@ class FlappyActionGame extends FlameGame
     (player as FlappyBird).jump();
   }
 
-  @override
-  void update(double dt) {
-    if (isGameOver || !isGameStarted) {
-      return;
-    }
-    super.update(dt);
+  void gameOver() {
+    // overlays.add('gameOverMenu'); // todo: add game over screen
+    pauseEngine();
   }
+
+  // @override
+  // void update(double dt) {
+  //   if (isGameOver) {
+  //     return;
+  //   }
+  //   super.update(dt);
+  // }
 
   // @override
   // bool get debugMode => true;

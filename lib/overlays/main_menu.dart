@@ -62,6 +62,7 @@ class MainMenu extends StatelessWidget {
                             // game.startGame();
                             game.overlays.remove('mainMenu');
                             game.isGameStarted = true;
+                            game.resumeEngine();
                           },
                           // child: SpriteWidget(sprite: SpriteUtil.playButton),
                           child: SpriteWidget(sprite: SpriteUtil.tapSprite),
