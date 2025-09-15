@@ -8,7 +8,7 @@ import 'package:flappy_action/util/sprite_util.dart';
 import 'package:vector_math/vector_math.dart';
 
 class Enemy extends Bird {
-  double health = 10;
+  double health = 4;
 
   Enemy({
     required super.size,
