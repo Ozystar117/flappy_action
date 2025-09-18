@@ -4,16 +4,15 @@ import 'package:flappy_action/components/obstacles/pipe_pair.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 
 class PipeSpawner extends SpawnComponent {
+  static int numberOfSpawns = 0;
+
   PipeSpawner()
     : super(
-        period: 4, // Spawn pipes every 4 seconds
-        factory: (int index) => PipePair(
-          position: Vector2(
-            GameUtil.width +
-                GameUtil.getRelativeX(1), // Start off-screen to the right
-            0, // Y position will be calculated in PipePair
-          ),
-        ),
+        period: 1,
+        factory: (int index) {
+          numberOfSpawns++;
+          return createPipePair(index);
+        },
       );
 
   @override
@@ -27,5 +26,24 @@ class PipeSpawner extends SpawnComponent {
       0,
       0,
     );
+    numberOfSpawns = 0;
   }
+
+  static PipePair createPipePair(int index) {
+    return PipePair(
+      position: Vector2(GameUtil.width + GameUtil.getRelativeX(1), 0),
+    );
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    // After the first spawn, set the period to 4 seconds
+    if (numberOfSpawns > 0) {
+      period = 4;
+    }
+  }
+
+  // int getNumberOfSpawns() {}
 }
