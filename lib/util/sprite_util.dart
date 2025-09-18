@@ -63,6 +63,7 @@ class SpriteUtil {
   static Sprite pauseButtonSprite = getSprite(121, 306, 13, 14);
   static Sprite gameOverText = getSprite(395, 59, 96, 21);
   static Sprite menuButton = getSprite(462, 26, 40, 14);
+  static Sprite readyText = getSprite(295, 59, 92, 25);
 
   // GET SPRITE FROM SPRITE SHEET
   static Sprite getSprite(double x, double y, double width, double height) {

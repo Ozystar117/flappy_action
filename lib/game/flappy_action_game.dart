@@ -24,7 +24,7 @@ class FlappyActionGame extends FlameGame
 
   late JoystickComponent joystick;
 
-  final PipeSpawner pipeSpawner = PipeSpawner();
+  late PipeSpawner pipeSpawner;
 
   late ScoreDisplay scoreDisplay;
 
@@ -32,16 +32,6 @@ class FlappyActionGame extends FlameGame
 
   bool isGameOver = false;
   bool isGameStarted = false;
-
-  void initForRestart() {
-    player = FlappyBird(
-      size: GameUtil.getRelativeSizeX(0.7),
-      position: size / 2,
-      animationTime: 0.12,
-      joystick: joystick,
-    );
-    scoreDisplay = ScoreDisplay();
-  }
 
   @override
   void onLoad() async {
@@ -69,19 +59,21 @@ class FlappyActionGame extends FlameGame
       anchor: Anchor.center,
     );
 
-    initForRestart();
-
     addAll([world, cameraComponent]);
 
-    addComponentsToViewport();
-
-    addComponentsToWorld();
-
-    pauseEngine();
+    pauseEngine(); // pause as we are still in the main menu
   }
 
   void addComponentsToWorld() {
     // PipePair pipePair = PipePair(position: Vector2(size.x / 2, 0));
+    player = FlappyBird(
+      size: GameUtil.getRelativeSizeX(0.7),
+      position: size / 2,
+      animationTime: 0.12,
+      joystick: joystick,
+    );
+    scoreDisplay = ScoreDisplay();
+    pipeSpawner = PipeSpawner();
 
     world.addAll([
       Background(size: size, position: Vector2(0, 0), animationTime: 30),
@@ -106,18 +98,30 @@ class FlappyActionGame extends FlameGame
     pauseEngine();
   }
 
-  void restart() {
-    // isGameOver = false;
-
-    world.removeAll(world.children);
-    cameraComponent.viewport.removeAll(cameraComponent.viewport.children);
-
-    initForRestart();
-
+  Future<void> startGame() async {
     addComponentsToWorld();
     addComponentsToViewport();
+    await Future.delayed(const Duration(milliseconds: 50));
+    countdown();
+  }
 
-    overlays.remove('gameOverMenu');
+  void restartGame() async {
+    reset();
+    await startGame();
+  }
+
+  void reset() {
+    world.removeAll(world.children);
+    cameraComponent.viewport.removeAll(cameraComponent.viewport.children);
+  }
+
+  void countdown() {
+    overlays.add('countdown');
+    pauseEngine();
+  }
+
+  void countdownComplete() {
+    overlays.remove('countdown');
     resumeEngine();
   }
 
