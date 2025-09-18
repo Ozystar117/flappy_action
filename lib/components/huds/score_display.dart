@@ -10,6 +10,9 @@ class ScoreDisplay extends PositionComponent {
   int score = 0;
   late TextComponent scoreText;
   final List<SpriteComponent> digits = [];
+  // Timer to track seconds
+  double _timeAccumulator = 0.0;
+  static const double _scoreInterval = 1.0; // 1 second
 
   ScoreDisplay()
     : super(
@@ -26,8 +29,15 @@ class ScoreDisplay extends PositionComponent {
   @override
   void update(double dt) {
     super.update(dt);
-    incrementScore();
-    updateScoreDisplay();
+
+    // Accumulate time
+    _timeAccumulator += dt;
+
+    // Check if a second has passed
+    if (_timeAccumulator >= _scoreInterval) {
+      incrementScore();
+      _timeAccumulator = 0.0; // Reset the timer
+    }
   }
 
   void initScore() {
