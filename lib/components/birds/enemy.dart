@@ -14,7 +14,8 @@ class Enemy extends Bird with HasGameReference<FlappyActionGame> {
   double health = 4;
 
   static const int killPoints = 5;
-  static const double _deathDuration = 0.3;
+  static const double _deathDuration = 0.5;
+  static const double _deathFadeDuration = 0.2;
 
   bool _isDying = false;
   bool get isDying => _isDying;
@@ -63,14 +64,22 @@ class Enemy extends Bird with HasGameReference<FlappyActionGame> {
     // Held in a field because a flash added this same frame isn't in
     // `children` yet; it would otherwise fight the fade-out.
     _flash?.removeFromParent();
+    // The killing shot usually lands mid-flash, while the enemy is dimmed.
+    opacity = 1;
     removeAll(children.whereType<CircleHitbox>());
 
     game.scoreDisplay.addPoints(killPoints);
     parent?.add(ScorePopup(points: killPoints, position: position.clone()));
 
+    // Fade only at the end so the spin and shrink stay visible.
     addAll([
-      RotateEffect.by(pi, EffectController(duration: _deathDuration)),
-      OpacityEffect.fadeOut(EffectController(duration: _deathDuration)),
+      RotateEffect.by(2 * pi, EffectController(duration: _deathDuration)),
+      OpacityEffect.fadeOut(
+        EffectController(
+          duration: _deathFadeDuration,
+          startDelay: _deathDuration - _deathFadeDuration,
+        ),
+      ),
       ScaleEffect.to(
         Vector2.zero(),
         EffectController(duration: _deathDuration),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -122,13 +124,37 @@ void main() {
       await hit(game, enemy);
       await hit(game, enemy);
 
-      game.update(0.2);
+      game.update(0.45);
       await game.ready();
       expect(enemy.isMounted, isTrue);
 
-      game.update(0.15);
+      game.update(0.1);
       await game.ready();
       expect(enemy.isMounted, isFalse);
+    },
+  );
+
+  testWithGame<_TestGame>(
+    'stays fully visible while it spins and shrinks',
+    _TestGame.new,
+    (game) async {
+      final enemy = await addEnemy(game);
+      await hit(game, enemy);
+      // Kill mid-flash, like the 20 shots/s gun does.
+      game.update(0.05);
+      expect(enemy.opacity, lessThan(1));
+
+      await hit(game, enemy);
+      expect(enemy.opacity, 1);
+
+      game.update(0.25);
+      expect(enemy.opacity, closeTo(1, 1e-6));
+      expect(enemy.angle, closeTo(pi, 1e-3));
+      expect(enemy.scale.y, closeTo(0.5, 1e-3));
+
+      game.update(0.05); // end of the fade's start delay
+      game.update(0.1);
+      expect(enemy.opacity, closeTo(0.5, 1e-3));
     },
   );
 }

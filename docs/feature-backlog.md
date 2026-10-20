@@ -14,7 +14,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 - **Core loop:** tap to flap; gravity pulls the bird down. Hitting the ground, a pipe, or an enemy ends the run.
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
-- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins, shrinks, and fades out over 0.3 s (harmless while dying) and a "+5" floats up.
+- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins a full turn and shrinks over 0.5 s, fading only in the last 0.2 s (harmless while dying) and a "+5" floats up.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
 - **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
 - **Countdown:** "Get Ready" bobs while 3-2-1 each punch in from 2× (2 grid units tall at rest); 3 s total.
@@ -58,7 +58,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 **Goal:** killing an enemy feels rewarding — it spins and shrinks away, a "+5" floats up where it died, and the score jumps by 5.
 
 **Acceptance criteria**
-- [ ] At 0 HP the enemy spins half a turn, shrinks to 0, and fades out over 0.3 s, then is removed.
+- [ ] At 0 HP the enemy snaps back to full opacity (the killing shot usually lands mid-flash), spins a full turn and shrinks to 0 over 0.5 s, fading out only in the last 0.2 s, then is removed.
 - [ ] A dying enemy can't end the run: its hitbox is removed and the bird ignores it, even in the frame it died.
 - [ ] Bullets hitting a dying enemy are ignored — no second death animation, no flash, no extra points.
 - [ ] The killing shot doesn't trigger the hit flash; any running flash is removed so it doesn't fight the fade-out.
@@ -73,8 +73,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - `lib/components/birds/enemy.dart`:
   - Add `HasGameReference<FlappyActionGame>`, a private `_isDying` flag, and `bool get isDying`.
   - In `onCollisionStart`: return early if dying; otherwise apply damage, then either show the existing flash (health > 0) or call `_die()`.
-  - `_die()`: set `_isDying`; remove any `OpacityEffect` and the `CircleHitbox`; call `game.scoreDisplay.addPoints(killPoints)`; add a `ScorePopup` to `parent` at the enemy's position; add `RotateEffect.by(pi)`, `OpacityEffect.fadeOut`, and `ScaleEffect.to(Vector2.zero())`, all 0.3 s, with `onComplete: removeFromParent` on the scale effect.
-  - `static const int killPoints = 5;` `static const double _deathDuration = 0.3;`
+  - `_die()`: set `_isDying`; remove the running flash and the `CircleHitbox`; set `opacity = 1`; call `game.scoreDisplay.addPoints(killPoints)`; add a `ScorePopup` to `parent` at the enemy's position; add `RotateEffect.by(2 * pi)` and `ScaleEffect.to(Vector2.zero())` over 0.5 s (`onComplete: removeFromParent` on the scale effect), and `OpacityEffect.fadeOut` over 0.2 s with a 0.3 s start delay.
+  - `static const int killPoints = 5;` `static const double _deathDuration = 0.5;` `static const double _deathFadeDuration = 0.2;`
   - Fix the `flame/src` and `vector_math` imports (clears 2 of the 3 analyzer issues).
 - `lib/components/birds/flappy_bird.dart`: ignore `Enemy` collisions when `isDying`.
 - `lib/components/huds/score_display.dart`:
@@ -97,7 +97,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
   - Two bullets kill the enemy.
   - After the killing hit: score +5, `isDying` true, no `CircleHitbox`, a `ScorePopup` exists.
   - Another bullet changes nothing.
-  - After 0.3 s the enemy is removed.
+  - Killed mid-flash, it is at full opacity with half a turn and half size at 0.25 s; after 0.5 s it is removed.
 - `ScorePopup`: removed after 0.6 s; moved up by 0.5 grid units.
 
 **Manual simulator checklist**
