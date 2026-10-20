@@ -1,0 +1,14 @@
+---
+description: Core project boundaries, code hygiene, and approval gates for Flappy Action
+alwaysApply: true
+---
+
+# Project core
+
+- Prefer the smallest change that solves the request; match existing code patterns. No drive-by refactors.
+- Delete superseded code instead of commenting it out — git keeps history.
+- Game state transitions (start, pause, resume, countdown, game over, main menu, reset) go through methods on `FlappyActionGame`. Add a method there rather than manipulating `overlays` or the engine from elsewhere.
+- Do not hand-edit `ios/`, `android/`, `macos/`, `linux/`, `windows/`, or `web/` unless the human asks. Commit Flutter's automatic migrations separately from feature work.
+- Do not add packages to `pubspec.yaml` without saying why; prefer what Flame and Flutter already provide.
+- Ask the human before: destructive git (`reset --hard`, force-push, branch deletion), merging into `main`, or deleting assets.
+- Verify with `flutter analyze` (and `flutter test` once tests exist) before declaring work done.

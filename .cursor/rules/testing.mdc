@@ -1,0 +1,15 @@
+---
+description: Testing conventions for Flame and Flutter tests — use when writing, updating, or running tests
+globs: test/**
+alwaysApply: false
+---
+
+# Testing
+
+- Game and component tests use `flame_test` (add it under `dev_dependencies` the first time it's needed). Overlay widgets use `flutter_test`.
+- Mirror `lib/` under `test/`: `lib/components/obstacles/pipe.dart` → `test/components/obstacles/pipe_test.dart`.
+- Prefer `testWithGame` / `testWithFlameGame` and drive time with `game.update(dt)` instead of real delays.
+- Assert on behaviour (positions, children, overlays active, score) rather than private fields.
+- Load the spritesheet (or use a test game that does) before constructing components that touch `SpriteUtil` or `GameUtil`.
+- Run with `flutter test` (focused: `flutter test test/path/to/file_test.dart`).
+- Never skip, delete, or weaken a failing test to get green without the human's explicit approval.

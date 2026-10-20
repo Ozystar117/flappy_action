@@ -1,0 +1,20 @@
+---
+description: Flutter overlay conventions — registration in main.dart, grid layout, routing through game methods
+globs: lib/overlays/**,lib/main.dart
+alwaysApply: false
+---
+
+# Overlays
+
+- Each overlay is a widget in `lib/overlays/` that takes `final FlappyActionGame game` in its constructor.
+- Register every overlay in `main.dart`'s `overlayBuilderMap`. The key is the overlay name used everywhere else (`mainMenu`, `pauseMenu`, `gameOverMenu`, `countdown`).
+- Lay out on a 10×10 grid with `LayoutBuilder`, matching the existing overlays:
+
+```dart
+final gridX = constraints.maxWidth / 10;
+final gridY = constraints.maxHeight / 10;
+```
+
+- Use `SpriteWidget(sprite: SpriteUtil.…)` for buttons and titles; wrap content in `SafeArea`.
+- Button handlers call one `game.<method>()` (`startGame`, `resumeGame`, `restartGame`, `goToMainMenu`, …). Do not call `game.overlays.add/remove`, `pauseEngine`, or `resumeEngine` from an overlay — add a method to `FlappyActionGame` instead.
+- Dimmed modal overlays use a full-screen `Container(color: Colors.black.withAlpha(…))` under the content, like `PauseMenu`.
