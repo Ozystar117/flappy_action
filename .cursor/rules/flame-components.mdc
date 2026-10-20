@@ -1,0 +1,22 @@
+---
+description: Flame component conventions — grid sizing, sprites, hitboxes, world vs viewport, lifecycle
+globs: lib/components/**,lib/game/**
+alwaysApply: false
+---
+
+# Flame components
+
+- **Sizing and position:** use `GameUtil` helpers (`getRelativeSizeX`, `getRelativeX/Y`, `center`, `right`, `bottom`, …). Never hardcode pixel values.
+
+```dart
+// ❌ size: Vector2(48, 48)
+// ✅ size: GameUtil.getRelativeSizeX(0.7)
+```
+
+- **Sprites:** only via `SpriteUtil`. Assign them in `onLoad`, not in field initialisers or before the game has loaded the spritesheet.
+- **Folders:** birds → `components/birds/`, pipes and other obstacles → `components/obstacles/`, HUD → `components/huds/`. Shared base behaviour goes in an abstract base class (see `Bird`).
+- **Collisions:** add a hitbox in `onLoad` (`CircleHitbox` for round sprites, `RectangleHitbox` for rectangles) and use `CollisionCallbacks`. The game already mixes in `HasCollisionDetection`.
+- **World vs viewport:** gameplay objects go in `world` (`addComponentsToWorld`); HUD goes in `cameraComponent.viewport` (`addComponentsToViewport`).
+- **Game access:** use `HasGameReference<FlappyActionGame>` and call `game.<method>()` for state changes.
+- **Cleanup:** anything added during play must be removed by `reset()`. Components that leave the screen (pipes, bullets, enemies) should `removeFromParent()` themselves.
+- **Timing:** scale movement by `dt` in `update`; use Flame `Timer`/`TimerComponent` rather than `Future.delayed` for gameplay timing so pausing works.
