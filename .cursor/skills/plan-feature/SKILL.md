@@ -40,11 +40,13 @@ Score the idea 1–5 on each criterion, one line of reasoning each:
 | Risk | Does it add game states or touch pause/resume/restart/reset? 5 = low risk |
 | Readiness | Are its dependencies built? 5 = ready now |
 
-End with a verdict — **Build now**, **Defer** (state what must happen first), or **Drop** — and the main reason in one sentence.
+End with a verdict — **Build now**, **Defer** (state what must happen first), or **Drop** — and the main reason in one sentence. Then ask whether to write a spec; never start one unprompted.
 
 ## Mode 3: Spec
 
-For an approved idea, produce a spec that `implement-feature` can execute:
+Only when the human has asked for a spec. Draft it **in chat only** — do not write it to `docs/feature-backlog.md` yet. Then ask the human to approve it or request changes; revise in chat and ask again until it is explicitly approved. A request to write the spec is not approval of its contents.
+
+The spec must be something `implement-feature` can execute:
 
 ```markdown
 ### <Feature name>
@@ -68,9 +70,9 @@ For an approved idea, produce a spec that `implement-feature` can execute:
 
 ## Record the outcome
 
-Update `docs/feature-backlog.md` in the same turn:
-- Evaluated ideas → add/update an entry with scores, verdict, and date.
-- Specced ideas → set status to `Ready` and link or paste the spec.
+Update `docs/feature-backlog.md`:
+- Evaluated ideas → add/update an entry with scores, verdict, and date (same turn).
+- Specs → only after the human approves the draft: paste it under `## Specs` and set status to `Ready`. Until then, leave the status as `Evaluated`.
 - Rejected ideas → keep them, with the reason, so they aren't re-proposed.
 
 Ask before committing the backlog change.
