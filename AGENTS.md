@@ -17,6 +17,7 @@ Flappy Action is a Flappy Bird–style action game: the player flies through pip
 | `lib/util/gameUtil.dart` | `GameUtil` — 10×10 screen grid for responsive sizing/positioning |
 | `lib/util/sprite_util.dart` | `SpriteUtil` — every sprite, cut from `assets/images/spritesheet.png` |
 | `test/` | Tests (none yet — see `write-tests`) |
+| `docs/feature-backlog.md` | Feature ideas, evaluations, decisions, and current game state |
 
 ## Commands
 
@@ -51,6 +52,7 @@ There is no CI. `flutter analyze` + `flutter test` are the local gate.
 
 | Task | How |
 |------|-----|
+| Brainstorm, evaluate, or spec a feature | Skill `plan-feature` (records in `docs/feature-backlog.md`) |
 | New gameplay feature | Skill `implement-feature` |
 | Bug / regression | Skill `fix-bug` |
 | New sprite from the spritesheet | Skill `add-sprite` |

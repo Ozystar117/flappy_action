@@ -18,7 +18,7 @@ description: Implements a Flappy Action gameplay feature (enemies, bullets, scor
 
 ## Instructions
 
-1. **Clarify scope** — Restate the feature and acceptance criteria. If something critical is ambiguous (e.g. how an enemy moves), ask once; otherwise state assumptions.
+1. **Clarify scope** — If `docs/feature-backlog.md` has a spec for this feature, use it as the acceptance criteria. Otherwise restate the feature and criteria; if something critical is ambiguous (e.g. how an enemy moves), ask once or suggest `plan-feature` first.
 2. **Read neighbours** — Skim `FlappyActionGame` and the components nearest to the change. Follow `AGENTS.md` and `.cursor/rules/`.
 3. **Plan briefly** — List the files to add or change. Keep it small; no drive-by refactors.
 4. **Implement**
@@ -29,7 +29,7 @@ description: Implements a Flappy Action gameplay feature (enemies, bullets, scor
 5. **Tests** — Add tests for logic that can be tested without the simulator (follow `write-tests`).
 6. **Verify** — Run `flutter analyze` and `flutter test`; fix failures.
 7. **Review** — Run the `verifier` and `code-reviewer` subagents in parallel. Address Critical findings (max 2 fix cycles, then stop and ask the human).
-8. **Summarize** — What changed, the manual simulator checklist, and anything deferred.
+8. **Summarize** — What changed, the manual simulator checklist, and anything deferred. If the feature is in `docs/feature-backlog.md`, update its status and the "Current state of the game" section.
 
 ## Failure behaviour
 
