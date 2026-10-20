@@ -29,6 +29,19 @@ class SpriteUtil {
   static Sprite digit8 = getSprite(320, 184, 12, 18);
   static Sprite digit9 = getSprite(334, 184, 12, 18);
 
+  // Non-bold digits (score panel style), scattered across the sheet
+  static Sprite smallDigit0 = getSprite(137, 306, 7, 10);
+  static Sprite smallDigit1 = getSprite(139, 477, 5, 10);
+  static Sprite smallDigit2 = getSprite(137, 489, 7, 10);
+  static Sprite smallDigit3 = getSprite(131, 501, 7, 10);
+  static Sprite smallDigit4 = getSprite(502, 0, 7, 10);
+  static Sprite smallDigit5 = getSprite(502, 12, 7, 10);
+  static Sprite smallDigit6 = getSprite(505, 26, 7, 10);
+  static Sprite smallDigit7 = getSprite(505, 42, 7, 10);
+  static Sprite smallDigit8 = getSprite(293, 242, 7, 10);
+  static Sprite smallDigit9 = getSprite(311, 206, 7, 10);
+  static Sprite plusSign = getSprite(496, 84, 5, 5);
+
   static Sprite getDigitSprite(int digit) {
     switch (digit) {
       case 0:
