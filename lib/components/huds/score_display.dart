@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/text.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
-import 'package:flutter/material.dart';
 
 class ScoreDisplay extends PositionComponent {
   int score = 0;
-  late TextComponent scoreText;
   final List<SpriteComponent> digits = [];
   // Timer to track seconds
   double _timeAccumulator = 0.0;
@@ -22,8 +19,7 @@ class ScoreDisplay extends PositionComponent {
 
   @override
   FutureOr<void> onLoad() {
-    initScore();
-    // updateScoreDisplay();
+    updateScoreDisplay();
   }
 
   @override
@@ -40,25 +36,9 @@ class ScoreDisplay extends PositionComponent {
     }
   }
 
-  void initScore() {
-    scoreText = TextComponent(
-      text: '0',
-      anchor: Anchor.center,
-      textRenderer: TextPaint(
-        style: TextStyle(
-          fontSize: GameUtil.getRelativeY(0.5),
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-    add(scoreText);
-  }
-
   void incrementScore() {
     score++;
-    scoreText.text = score.toString();
-    // updateScoreDisplay();
+    updateScoreDisplay();
   }
 
   void updateScoreDisplay() {
@@ -68,29 +48,26 @@ class ScoreDisplay extends PositionComponent {
     }
     digits.clear();
 
-    // Convert score to string and create digit sprites
-    final scoreString = score.toString();
-    final digitWidth = GameUtil.getRelativeX(0.3); // Adjust size as needed
-    final digitHeight = GameUtil.getRelativeY(0.3);
+    final digitHeight = GameUtil.getRelativeY(0.6);
+    final gap = digitHeight * 0.1;
+    var x = 0.0;
 
-    // Calculate total width to center the score
-    final totalWidth = digitWidth * scoreString.length;
-    final startX =
-        -totalWidth / 2; // Center relative to this component's position
-
-    for (int i = 0; i < scoreString.length; i++) {
-      final digit = int.parse(scoreString[i]);
+    for (final char in score.toString().split('')) {
+      final sprite = SpriteUtil.getDigitSprite(int.parse(char));
+      // Keep each digit's own aspect ratio; the '1' is narrower than the rest
+      final digitWidth = digitHeight * sprite.srcSize.x / sprite.srcSize.y;
       final digitComponent = SpriteComponent(
-        sprite: SpriteUtil.getDigitSprite(digit),
+        sprite: sprite,
         size: Vector2(digitWidth, digitHeight),
-        position: Vector2(
-          startX + (i * digitWidth),
-          0, // Relative to this component's position
-        ),
+        position: Vector2(x, 0),
       );
 
       add(digitComponent);
       digits.add(digitComponent);
+      x += digitWidth + gap;
     }
+
+    // Size to the digits so Anchor.topCenter centres the whole score
+    size = Vector2(x - gap, digitHeight);
   }
 }
