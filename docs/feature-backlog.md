@@ -40,8 +40,87 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
 | Sound effects | Idea | | | | | | | Needs `flame_audio` and assets |
+| Score pop + milestone pulse | Ready | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
+| Countdown punch-in | Ready | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
+| Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
+| Game-over score tally | Idea | | | | | | | L. Count-up + NEW badge/medals. Needs a game-over score panel first; pairs with persistent high score |
 
 ## Specs
+
+### Score pop + milestone pulse
+
+**Goal:** the score gives a small pop every time it goes up and a bigger pulse every 10 points, so survival feels like progress.
+
+**Acceptance criteria**
+- [ ] Each increment: `ScoreDisplay` scales to 1.1× and back to 1.0× over 0.15 s total.
+- [ ] Every multiple of 10: scales to 1.3× and back over 0.25 s total instead.
+- [ ] The pulse grows from the top centre (the component's anchor); the score doesn't drift sideways.
+- [ ] Scale always settles at exactly 1.0, even if increments overlap — effects never stack.
+- [ ] No pop when the score first appears at `0`.
+- [ ] While paused, the effect freezes and finishes after resume. Restart and main menu show `0` at normal scale.
+- [ ] Scoring rules and digit layout are unchanged.
+
+**Design**
+- Change only `lib/components/huds/score_display.dart`.
+- In `incrementScore()`, after `updateScoreDisplay()`, call a private `_pop()`:
+  - remove any running `ScaleEffect` children and reset `scale` to `Vector2.all(1)` (`ScaleEffect.to` with `alternate` returns to the scale it started from);
+  - add `ScaleEffect.to(Vector2.all(target), EffectController(duration: half, alternate: true, curve: Curves.easeOut))`.
+- Effect goes on `ScoreDisplay` itself, never on digit children — digits are rebuilt on every increment.
+- Tuning as `static const` fields: pop 1.1× / 0.075 s each way; milestone 1.3× / 0.125 s each way; milestone every 10 points.
+
+**Testable logic** (extend `test/components/huds/score_display_test.dart`)
+- After `incrementScore()`, a `ScaleEffect` is attached.
+- At 9 → 10, advancing by the milestone half-duration reaches ~1.3×; a normal increment reaches ~1.1×.
+- After advancing past the effect duration, `scale` is 1.0 and no `ScaleEffect` remains.
+- Two increments in quick succession still end at exactly 1.0.
+- A freshly loaded `ScoreDisplay` has no `ScaleEffect`.
+
+**Manual simulator checklist**
+1. Start a run → `0` appears without a pop; at `1` a subtle pop.
+2. Watch `9 → 10` and `19 → 20` → noticeably bigger pulse, digits stay centred.
+3. Pause right as the score changes → resume → the pop finishes and size returns to normal.
+4. Die → restart → `0` at normal size. Main menu → play → same.
+5. Watch for 30+ s → pops feel lively but not distracting.
+
+**Out of scope**
+- Colour, glow, or rotation effects; sound.
+- Effects on individual digits.
+- Changing scoring rules.
+
+### Countdown punch-in
+
+**Goal:** the 3-2-1 countdown builds anticipation — each number punches in and "Get Ready" bobs gently.
+
+**Acceptance criteria**
+- [ ] Each number (3, 2, 1) enters by scaling from 2.0× to 1.0× with a slight overshoot while fading in, over 300 ms; the outgoing number fades out.
+- [ ] "Get Ready" bobs up and down by 0.1 grid units on a 1 s loop (0.5 s each way).
+- [ ] Countdown timing is unchanged: 3 s total, and `countdownComplete()` is called exactly once.
+- [ ] Animations play every time the countdown appears: start, restart, and resume after pause.
+- [ ] Animation controllers and timers are disposed with the overlay.
+
+**Design**
+- Change only `lib/overlays/countdown.dart`. Use Flutter animations — the engine is paused during the countdown, so Flame effects wouldn't run.
+- Add `SingleTickerProviderStateMixin`; an `AnimationController` (500 ms, `repeat(reverse: true)`) drives the bob through `AnimatedBuilder` + `Transform.translate`, offset computed from `gridY * 0.1` inside the existing `LayoutBuilder`.
+- Wrap the number in `AnimatedSwitcher` (300 ms) with a `transitionBuilder` combining `FadeTransition` and `ScaleTransition` (`Tween(2.0 → 1.0)`, `Curves.easeOutBack`). Key each number with `ValueKey(countdown)`.
+- Keep the existing `Timer.periodic` and `_getCountdownSprite`; dispose the controller in `dispose()`.
+
+**Testable logic** (new `test/overlays/countdown_test.dart`, `testWidgets`)
+- Use a `FlappyActionGame` subclass that counts `countdownComplete()` calls instead of touching the engine; register a generated stand-in spritesheet as in the score tests.
+- Shows `3` initially, `2` after 1 s, `1` after 2 s (advance with `tester.pump(duration)` — never `pumpAndSettle`, the bob repeats forever).
+- `countdownComplete()` is called once after 3 s and not again after 4 s.
+- No pending timers after the widget is removed (the test framework fails on leaks).
+
+**Manual simulator checklist**
+1. Main menu → tap → "Get Ready" bobs; 3, 2, 1 each punch in with a slight overshoot.
+2. Countdown still feels like 3 s; the bird doesn't move until it ends.
+3. Pause mid-run → resume → countdown animates again.
+4. Die → restart → animates again. Main menu → play → animates again.
+5. Small and large simulators → numbers stay centred, no clipping during the 2× scale.
+
+**Out of scope**
+- A "Go!" frame, sound.
+- Moving the countdown to a Flame timer.
+- Replacing `_getCountdownSprite`'s `switch`.
 
 ### Sprite-sheet score digits
 
@@ -88,4 +167,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 _Newest first. One line per decision: date, idea, verdict, reason._
 
+- 2026-10-20 — Score pop + milestone pulse — Build now — one-file Flame effects episode, felt every second, follows directly from the score-digits episode.
+- 2026-10-20 — Countdown punch-in — Build now — one-file Flutter animations episode felt at every start and resume; risk is only in keeping countdown timing intact.
+- 2026-10-20 — Pause button press effect — Drop — tapping pauses the engine immediately, so a Flame effect on the button would never play.
 - 2026-10-20 — Sprite-sheet score digits — Build now — one-file, low-risk polish visible every run; digits already on the sheet and in `SpriteUtil`; good standalone tutorial segment.
