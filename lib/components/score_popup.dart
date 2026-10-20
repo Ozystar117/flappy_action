@@ -41,24 +41,23 @@ class ScorePopup extends PositionComponent {
     final sprites = [
       SpriteUtil.plusSign,
       for (final char in points.toString().split(''))
-        SpriteUtil.getSmallDigitSprite(int.parse(char)),
+        SpriteUtil.getTinyDigitSprite(int.parse(char)),
     ];
+    // One scale for every sprite keeps the plus at its pixel size relative
+    // to the digits
+    final pixelScale = digitHeight / SpriteUtil.tinyDigit0.srcSize.y;
     var x = 0.0;
 
     for (final sprite in sprites) {
-      // The plus is half a digit tall; centre it vertically
-      final height = sprite == SpriteUtil.plusSign
-          ? digitHeight / 2
-          : digitHeight;
-      final width = height * sprite.srcSize.x / sprite.srcSize.y;
+      final spriteSize = sprite.srcSize * pixelScale;
       add(
         SpriteComponent(
           sprite: sprite,
-          size: Vector2(width, height),
-          position: Vector2(x, (digitHeight - height) / 2),
+          size: spriteSize,
+          position: Vector2(x, (digitHeight - spriteSize.y) / 2),
         ),
       );
-      x += width + gap;
+      x += spriteSize.x + gap;
     }
 
     // Size to the sprites so Anchor.center centres the whole "+N"

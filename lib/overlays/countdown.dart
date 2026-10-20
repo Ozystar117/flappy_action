@@ -160,25 +160,12 @@ class _CountdownOverlayState extends State<CountdownOverlay>
   /// Sized from the sprite's own aspect ratio so every number has the same
   /// height (the '1' is narrower than the other digits).
   Widget _number(int value, double height) {
-    final sprite = _getCountdownSprite(value);
+    final sprite = SpriteUtil.getSmallDigitSprite(value);
     return SizedBox(
       key: ValueKey(value),
       height: height,
       width: height * sprite.srcSize.x / sprite.srcSize.y,
       child: SpriteWidget(sprite: sprite),
     );
-  }
-
-  Sprite _getCountdownSprite(int number) {
-    switch (number) {
-      case 3:
-        return SpriteUtil.digit3;
-      case 2:
-        return SpriteUtil.digit2;
-      case 1:
-        return SpriteUtil.digit1;
-      default:
-        return SpriteUtil.digit1;
-    }
   }
 }

@@ -29,9 +29,24 @@ void main() {
 
     expect(sprites.map((s) => s.sprite), [
       SpriteUtil.plusSign,
-      SpriteUtil.smallDigit1,
-      SpriteUtil.smallDigit5,
+      SpriteUtil.tinyDigit1,
+      SpriteUtil.tinyDigit5,
     ]);
+  });
+
+  testWithFlameGame('the plus keeps its pixel size relative to the digits', (
+    game,
+  ) async {
+    final sprites = spriteChildren(await addPopup(game));
+    final plus = sprites[0];
+    final digit = sprites[1];
+
+    expect(
+      plus.size.y / digit.size.y,
+      closeTo(plus.sprite!.srcSize.y / digit.sprite!.srcSize.y, 1e-6),
+    );
+    // Vertically centred against the digit
+    expect(plus.center.y, closeTo(digit.center.y, 1e-6));
   });
 
   testWithFlameGame('sprites keep their aspect ratio', (game) async {

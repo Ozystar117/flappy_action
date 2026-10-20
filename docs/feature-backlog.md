@@ -14,10 +14,10 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 - **Core loop:** tap to flap; gravity pulls the bird down. Hitting the ground, a pipe, or an enemy ends the run.
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
-- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins a full turn and shrinks over 0.5 s, fading only in the last 0.2 s (harmless while dying) and a "+5" in the non-bold sprite digits floats up.
+- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins a full turn and shrinks over 0.5 s, fading only in the last 0.2 s (harmless while dying) and a "+5" in the tiny sprite digits floats up.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
 - **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
-- **Countdown:** "Get Ready" bobs while 3-2-1 each punch in from 2× (2 grid units tall at rest); 3 s total.
+- **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s. No audio.
 
@@ -46,7 +46,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
 | Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
-| Sprite "+5" popup | Done | | | | | | | Kill popup uses `SpriteUtil.plusSign` + `smallDigit0–9` (non-bold, 0.4 grid units tall) instead of plain text |
+| Sprite "+5" popup | Done | | | | | | | Kill popup uses `SpriteUtil.plusSign` + `tinyDigit0–9` (0.4 grid units tall, one pixel scale for all sprites) instead of plain text |
 | Bird tilt | Idea | | | | | | | S. Nose up on flap, nose down when falling; joystick aim still overrides. `flappy_bird.dart` only |
 | Hit flash on death | Idea | | | | | | | S. White flash fading into the game-over dim, in `game_over_menu.dart` (engine is paused, so Flutter animation) |
 | Game-over score tally | Idea | | | | | | | L. Count-up + NEW badge/medals. Needs a game-over score panel first; pairs with persistent high score |
