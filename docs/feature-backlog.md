@@ -16,17 +16,17 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
 - **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit, removed at 0 HP.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
-- **Score:** +1 per second survived. Killing enemies and passing pipes give nothing.
+- **Score:** +1 per second survived, shown top centre with the spritesheet digits. Killing enemies and passing pipes give nothing.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s. No audio.
 
 ## Known gaps and tech debt
 
 - `flutter analyze` reports 3 issues: `enemy.dart` imports `flame/src/...` and `vector_math` directly; `gameUtil.dart` isn't snake_case.
-- No tests: `test/widget_test.dart` is fully commented out, so `flutter test` fails.
+- Test coverage is limited to `ScoreDisplay`. `flame_test` is pinned to 2.0.x because 2.2.3+ requires Flame 1.36+; upgrading Flame is a separate decision.
+- `pubspec.lock` is gitignored, so dependency versions aren't pinned across machines.
 - `isGameOver` / `isGameStarted` on `FlappyActionGame` are never updated.
 - `startGame` uses `Future.delayed` for timing.
-- `ScoreDisplay.updateScoreDisplay` (spritesheet digits) is unused; the score renders as plain text.
 - Leftover commented-out code in overlays, `PauseButton`, and `FlappyActionGame`.
 - `assets/images/spritesheet.png` is WebP data with a `.png` extension. Flutter decodes it fine; macOS `sips` needs `-s format png` before cropping.
 
@@ -34,7 +34,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 | Idea | Status | Fit | Fun | Effort | Risk | Ready | Verdict | Notes |
 |------|--------|-----|-----|--------|------|-------|---------|-------|
-| Sprite-sheet score digits | Ready | 3 | 3 | 5 | 5 | 5 | Build now | See [spec](#sprite-sheet-score-digits) |
+| Sprite-sheet score digits | Done | 3 | 3 | 5 | 5 | 5 | Build now | See [spec](#sprite-sheet-score-digits) |
 | Score for enemy kills / pipes passed | Idea | | | | | | | Combat currently has no reward |
 | Enemy death effect | Idea | | | | | | | Enemies just vanish at 0 HP |
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
