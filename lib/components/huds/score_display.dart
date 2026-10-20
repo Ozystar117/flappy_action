@@ -22,8 +22,8 @@ class ScoreDisplay extends PositionComponent {
 
   @override
   FutureOr<void> onLoad() {
-    // initScore();
-    updateScoreDisplay();
+    initScore();
+    // updateScoreDisplay();
   }
 
   @override
@@ -45,8 +45,8 @@ class ScoreDisplay extends PositionComponent {
       text: '0',
       anchor: Anchor.center,
       textRenderer: TextPaint(
-        style: const TextStyle(
-          fontSize: 32,
+        style: TextStyle(
+          fontSize: GameUtil.getRelativeY(0.5),
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
@@ -57,8 +57,8 @@ class ScoreDisplay extends PositionComponent {
 
   void incrementScore() {
     score++;
-    // scoreText.text = score.toString();
-    updateScoreDisplay();
+    scoreText.text = score.toString();
+    // updateScoreDisplay();
   }
 
   void updateScoreDisplay() {

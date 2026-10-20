@@ -56,7 +56,7 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
               final screenWidth = constraints.maxWidth;
               final screenHeight = constraints.maxHeight;
 
-              // Define your grid system for overlays
+              // Define the grid system for overlays
               final gridX = screenWidth / 10;
               final gridY = screenHeight / 10;
 

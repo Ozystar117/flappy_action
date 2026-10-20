@@ -99,6 +99,8 @@ class FlappyActionGame extends FlameGame
   }
 
   Future<void> startGame() async {
+    overlays.clear();
+    resumeEngine();
     addComponentsToWorld();
     addComponentsToViewport();
     await Future.delayed(const Duration(milliseconds: 50));
@@ -123,6 +125,24 @@ class FlappyActionGame extends FlameGame
   void countdownComplete() {
     overlays.remove('countdown');
     resumeEngine();
+  }
+
+  void pauseGame() {
+    overlays.add('pauseMenu');
+    pauseEngine();
+  }
+
+  void resumeGame() {
+    overlays.remove('pauseMenu');
+    resumeEngine();
+    countdown();
+  }
+
+  void goToMainMenu() {
+    overlays.clear();
+    overlays.add('mainMenu');
+    reset();
+    pauseEngine();
   }
 
   // @override

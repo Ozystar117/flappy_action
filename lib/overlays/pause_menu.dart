@@ -35,8 +35,9 @@ class PauseMenu extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Resume the game
-                        game.overlays.remove('pauseMenu');
-                        game.countdown();
+                        game.resumeGame();
+                        // game.overlays.remove('pauseMenu');
+                        // game.countdown();
                       },
                       child: SpriteWidget(sprite: SpriteUtil.playButton),
                     ),

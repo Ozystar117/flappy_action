@@ -27,8 +27,9 @@ class PauseButton extends SpriteComponent
   @override
   void onTapDown(TapDownEvent event) {
     // todo: pause the game
-    game.overlays.add('pauseMenu');
-    game.pauseEngine();
+    // game.overlays.add('pauseMenu');
+    // game.pauseEngine();
+    game.pauseGame();
     super.onTapDown(event);
   }
 }
