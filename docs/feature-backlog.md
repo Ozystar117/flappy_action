@@ -16,7 +16,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
 - **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit, removed at 0 HP.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
-- **Score:** +1 per second survived, shown top centre with the spritesheet digits. Killing enemies and passing pipes give nothing.
+- **Score:** +1 per second survived, shown top centre with the spritesheet digits; pops on each point and pulses bigger every 10. Killing enemies and passing pipes give nothing.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s. No audio.
 
@@ -40,7 +40,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
 | Sound effects | Idea | | | | | | | Needs `flame_audio` and assets |
-| Score pop + milestone pulse | Ready | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
+| Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Ready | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
 | Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
 | Game-over score tally | Idea | | | | | | | L. Count-up + NEW badge/medals. Needs a game-over score panel first; pairs with persistent high score |

@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
+import 'package:flutter/animation.dart';
 
 class ScoreDisplay extends PositionComponent {
   int score = 0;
@@ -10,6 +12,14 @@ class ScoreDisplay extends PositionComponent {
   // Timer to track seconds
   double _timeAccumulator = 0.0;
   static const double _scoreInterval = 1.0; // 1 second
+
+  // Pop effect when the score increases; bigger pulse on milestones
+  static const double _popScale = 1.1;
+  static const double _popHalfDuration = 0.075;
+  static const double _milestoneScale = 1.3;
+  static const double _milestoneHalfDuration = 0.125;
+  static const int _milestoneEvery = 10;
+  ScaleEffect? _popEffect;
 
   ScoreDisplay()
     : super(
@@ -39,6 +49,29 @@ class ScoreDisplay extends PositionComponent {
   void incrementScore() {
     score++;
     updateScoreDisplay();
+    _pop();
+  }
+
+  void _pop() {
+    // ScaleEffect.to with alternate returns to the scale it started from,
+    // so reset first or overlapping pops would leave the score enlarged.
+    // Pause the old effect too: removal is deferred, so it would otherwise
+    // still apply one more update this frame on top of the reset.
+    _popEffect
+      ?..pause()
+      ..removeFromParent();
+    scale = Vector2.all(1);
+
+    final isMilestone = score % _milestoneEvery == 0;
+    _popEffect = ScaleEffect.to(
+      Vector2.all(isMilestone ? _milestoneScale : _popScale),
+      EffectController(
+        duration: isMilestone ? _milestoneHalfDuration : _popHalfDuration,
+        alternate: true,
+        curve: Curves.easeOut,
+      ),
+    );
+    add(_popEffect!);
   }
 
   void updateScoreDisplay() {
