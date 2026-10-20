@@ -29,6 +29,31 @@ class SpriteUtil {
   static Sprite digit8 = getSprite(320, 184, 12, 18);
   static Sprite digit9 = getSprite(334, 184, 12, 18);
 
+  // Non-bold digits (score panel style), scattered across the sheet
+  static Sprite smallDigit0 = getSprite(137, 306, 7, 10);
+  static Sprite smallDigit1 = getSprite(139, 477, 5, 10);
+  static Sprite smallDigit2 = getSprite(137, 489, 7, 10);
+  static Sprite smallDigit3 = getSprite(131, 501, 7, 10);
+  static Sprite smallDigit4 = getSprite(502, 0, 7, 10);
+  static Sprite smallDigit5 = getSprite(502, 12, 7, 10);
+  static Sprite smallDigit6 = getSprite(505, 26, 7, 10);
+  static Sprite smallDigit7 = getSprite(505, 42, 7, 10);
+  static Sprite smallDigit8 = getSprite(293, 242, 7, 10);
+  static Sprite smallDigit9 = getSprite(311, 206, 7, 10);
+  static Sprite plusSign = getSprite(496, 84, 5, 5);
+
+  // Tiny non-bold digits, stacked in a column beside the bird sprites
+  static Sprite tinyDigit0 = getSprite(138, 323, 6, 7);
+  static Sprite tinyDigit1 = getSprite(141, 332, 3, 7);
+  static Sprite tinyDigit2 = getSprite(138, 349, 6, 7);
+  static Sprite tinyDigit3 = getSprite(138, 358, 6, 7);
+  static Sprite tinyDigit4 = getSprite(138, 375, 6, 7);
+  static Sprite tinyDigit5 = getSprite(138, 384, 6, 7);
+  static Sprite tinyDigit6 = getSprite(138, 401, 6, 7);
+  static Sprite tinyDigit7 = getSprite(138, 410, 6, 7);
+  static Sprite tinyDigit8 = getSprite(138, 427, 6, 7);
+  static Sprite tinyDigit9 = getSprite(138, 436, 6, 7);
+
   static Sprite getDigitSprite(int digit) {
     switch (digit) {
       case 0:
@@ -53,6 +78,60 @@ class SpriteUtil {
         return digit9;
       default:
         return digit0;
+    }
+  }
+
+  static Sprite getSmallDigitSprite(int digit) {
+    switch (digit) {
+      case 0:
+        return smallDigit0;
+      case 1:
+        return smallDigit1;
+      case 2:
+        return smallDigit2;
+      case 3:
+        return smallDigit3;
+      case 4:
+        return smallDigit4;
+      case 5:
+        return smallDigit5;
+      case 6:
+        return smallDigit6;
+      case 7:
+        return smallDigit7;
+      case 8:
+        return smallDigit8;
+      case 9:
+        return smallDigit9;
+      default:
+        return smallDigit0;
+    }
+  }
+
+  static Sprite getTinyDigitSprite(int digit) {
+    switch (digit) {
+      case 0:
+        return tinyDigit0;
+      case 1:
+        return tinyDigit1;
+      case 2:
+        return tinyDigit2;
+      case 3:
+        return tinyDigit3;
+      case 4:
+        return tinyDigit4;
+      case 5:
+        return tinyDigit5;
+      case 6:
+        return tinyDigit6;
+      case 7:
+        return tinyDigit7;
+      case 8:
+        return tinyDigit8;
+      case 9:
+        return tinyDigit9;
+      default:
+        return tinyDigit0;
     }
   }
 
