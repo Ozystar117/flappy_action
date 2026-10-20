@@ -14,17 +14,17 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 - **Core loop:** tap to flap; gravity pulls the bird down. Hitting the ground, a pipe, or an enemy ends the run.
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
-- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit, removed at 0 HP.
+- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins, shrinks, and fades out over 0.3 s (harmless while dying) and a "+5" floats up.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
-- **Score:** +1 per second survived, shown top centre with the spritesheet digits; pops on each point and pulses bigger every 10. Killing enemies and passing pipes give nothing.
+- **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
 - **Countdown:** "Get Ready" bobs while 3-2-1 each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s. No audio.
 
 ## Known gaps and tech debt
 
-- `flutter analyze` reports 3 issues: `enemy.dart` imports `flame/src/...` and `vector_math` directly; `gameUtil.dart` isn't snake_case.
-- Test coverage is limited to `ScoreDisplay`. `flame_test` is pinned to 2.0.x because 2.2.3+ requires Flame 1.36+; upgrading Flame is a separate decision.
+- `flutter analyze` reports 1 issue: `gameUtil.dart` isn't snake_case.
+- Test coverage is limited to `ScoreDisplay`, `Enemy`, `ScorePopup`, and the countdown overlay. `flame_test` is pinned to 2.0.x because 2.2.3+ requires Flame 1.36+; upgrading Flame is a separate decision.
 - `pubspec.lock` is gitignored, so dependency versions aren't pinned across machines.
 - `isGameOver` / `isGameStarted` on `FlappyActionGame` are never updated.
 - `startGame` uses `Future.delayed` for timing.
@@ -38,8 +38,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Idea | Status | Fit | Fun | Effort | Risk | Ready | Verdict | Notes |
 |------|--------|-----|-----|--------|------|-------|---------|-------|
 | Sprite-sheet score digits | Done | 3 | 3 | 5 | 5 | 5 | Build now | See [spec](#sprite-sheet-score-digits) |
-| Score for enemy kills / pipes passed | Ready | 5 | 4 | 4 | 4 | 5 | Build now | Kills only. See [spec](#enemy-death-pop--kill-reward) |
-| Enemy death effect | Ready | 5 | 4 | 5 | 4 | 5 | Build now | See [spec](#enemy-death-pop--kill-reward) |
+| Score for enemy kills / pipes passed | Done | 5 | 4 | 4 | 4 | 5 | Build now | Kills only. See [spec](#enemy-death-pop--kill-reward) |
+| Enemy death effect | Done | 5 | 4 | 5 | 4 | 5 | Build now | See [spec](#enemy-death-pop--kill-reward) |
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
 | Sound effects | Idea | | | | | | | Needs `flame_audio` and assets |

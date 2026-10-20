@@ -1,14 +1,24 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:flame/collisions.dart';
+import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flame/src/components/position_component.dart';
 import 'package:flappy_action/components/birds/bird.dart';
 import 'package:flappy_action/components/bullet.dart';
+import 'package:flappy_action/components/score_popup.dart';
+import 'package:flappy_action/game/flappy_action_game.dart';
 import 'package:flappy_action/util/sprite_util.dart';
-import 'package:vector_math/vector_math.dart';
 
-class Enemy extends Bird {
+class Enemy extends Bird with HasGameReference<FlappyActionGame> {
   double health = 4;
+
+  static const int killPoints = 5;
+  static const double _deathDuration = 0.3;
+
+  bool _isDying = false;
+  bool get isDying => _isDying;
+  OpacityEffect? _flash;
 
   Enemy({
     required super.size,
@@ -31,18 +41,41 @@ class Enemy extends Bird {
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
+    if (_isDying) return;
     if (other is Bullet) {
       health -= other.damage;
 
-      add(
-        OpacityEffect.fadeOut(
-          EffectController(alternate: true, duration: 0.1, repeatCount: 1),
-        ),
-      );
-
       if (health <= 0) {
-        removeFromParent();
+        _die();
+      } else {
+        _flash?.removeFromParent();
+        _flash = OpacityEffect.fadeOut(
+          EffectController(alternate: true, duration: 0.1, repeatCount: 1),
+        );
+        add(_flash!);
       }
     }
+  }
+
+  void _die() {
+    _isDying = true;
+
+    // Held in a field because a flash added this same frame isn't in
+    // `children` yet; it would otherwise fight the fade-out.
+    _flash?.removeFromParent();
+    removeAll(children.whereType<CircleHitbox>());
+
+    game.scoreDisplay.addPoints(killPoints);
+    parent?.add(ScorePopup(points: killPoints, position: position.clone()));
+
+    addAll([
+      RotateEffect.by(pi, EffectController(duration: _deathDuration)),
+      OpacityEffect.fadeOut(EffectController(duration: _deathDuration)),
+      ScaleEffect.to(
+        Vector2.zero(),
+        EffectController(duration: _deathDuration),
+        onComplete: removeFromParent,
+      ),
+    ]);
   }
 }

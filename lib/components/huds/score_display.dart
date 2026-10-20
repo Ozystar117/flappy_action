@@ -47,12 +47,19 @@ class ScoreDisplay extends PositionComponent {
   }
 
   void incrementScore() {
-    score++;
-    updateScoreDisplay();
-    _pop();
+    addPoints(1);
   }
 
-  void _pop() {
+  void addPoints(int points) {
+    final oldScore = score;
+    score += points;
+    updateScoreDisplay();
+    // Jumps of more than 1 can skip over an exact multiple, so pulse whenever
+    // a milestone is crossed.
+    _pop(isMilestone: score ~/ _milestoneEvery > oldScore ~/ _milestoneEvery);
+  }
+
+  void _pop({required bool isMilestone}) {
     // ScaleEffect.to with alternate returns to the scale it started from,
     // so reset first or overlapping pops would leave the score enlarged.
     // Pause the old effect too: removal is deferred, so it would otherwise
@@ -62,7 +69,6 @@ class ScoreDisplay extends PositionComponent {
       ..removeFromParent();
     scale = Vector2.all(1);
 
-    final isMilestone = score % _milestoneEvery == 0;
     _popEffect = ScaleEffect.to(
       Vector2.all(isMilestone ? _milestoneScale : _popScale),
       EffectController(

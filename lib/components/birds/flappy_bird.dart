@@ -69,7 +69,7 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (other is Enemy || other is Pipe) {
+    if ((other is Enemy && !other.isDying) || other is Pipe) {
       // game.isGameOver = true;
       game.gameOver();
     }

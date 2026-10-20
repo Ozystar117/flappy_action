@@ -173,6 +173,45 @@ void main() {
       expect(scaleEffects(scoreDisplay), isEmpty);
     });
 
+    testWithFlameGame('addPoints adds the points with a normal pop', (
+      game,
+    ) async {
+      final scoreDisplay = await addScoreDisplay(game);
+
+      scoreDisplay.addPoints(5);
+      await game.ready();
+
+      expect(scoreDisplay.score, 5);
+      game.update(0.075);
+      expect(scoreDisplay.scale.x, closeTo(1.1, 1e-3));
+    });
+
+    testWithFlameGame('addPoints pulses when it crosses a milestone', (
+      game,
+    ) async {
+      final scoreDisplay = await addScoreDisplay(game, score: 8);
+
+      scoreDisplay.addPoints(5);
+      await game.ready();
+
+      expect(scoreDisplay.score, 13);
+      game.update(0.125);
+      expect(scoreDisplay.scale.x, closeTo(1.3, 1e-3));
+    });
+
+    testWithFlameGame('addPoints from a milestone is a normal pop', (
+      game,
+    ) async {
+      final scoreDisplay = await addScoreDisplay(game, score: 10);
+
+      scoreDisplay.addPoints(5);
+      await game.ready();
+
+      expect(scoreDisplay.score, 15);
+      game.update(0.075);
+      expect(scoreDisplay.scale.x, closeTo(1.1, 1e-3));
+    });
+
     testWithFlameGame('overlapping pops from update do not drift', (
       game,
     ) async {
