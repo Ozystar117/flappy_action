@@ -44,7 +44,7 @@ End with a verdict — **Build now**, **Defer** (state what must happen first), 
 
 ## Mode 3: Spec
 
-Only when the human has asked for a spec. Draft it **in chat only** — do not write it to `docs/feature-backlog.md` yet. Then ask the human to approve it or request changes; revise in chat and ask again until it is explicitly approved. A request to write the spec is not approval of its contents.
+Only when the human has asked for a spec. Draft it **in chat only** — do not write it to `docs/feature-backlog.md` yet. Then ask the human to approve it or request changes; revise in chat and ask again until it is explicitly approved. A request to write the spec is not approval of its contents, and approving a spec does not authorise implementing it — implementation needs its own approval via `implement-feature`. Changing an existing spec follows the same rule: summarise the change in chat and wait for approval before editing it.
 
 The spec must be something `implement-feature` can execute:
 

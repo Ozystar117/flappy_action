@@ -41,6 +41,7 @@ There is no CI. `flutter analyze` + `flutter test` are the local gate.
 
 ## Working agreements
 
+- **Summary + explicit approval before implementing a feature or writing/changing a spec** — see `.cursor/rules/project-core.mdc` for what counts as approval and what doesn't need it.
 - One feature branch + PR per feature (matches existing history). Human merges.
 - Prefer the smallest change that meets the request; match existing patterns.
 - Delete superseded code instead of commenting it out — git keeps history.

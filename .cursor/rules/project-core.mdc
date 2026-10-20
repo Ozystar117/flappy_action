@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Project core
 
+- **Approval before features and specs.** Before implementing a feature (including follow-up tweaks to one, bug fixes, and new overlays) or writing/changing a spec in `docs/feature-backlog.md`, give a concise summary — what will change, which files, the approach, in a few bullets — and wait for the human's explicit approval in the current conversation.
+  - Approval is a clear yes to that summary ("yes", "go ahead", "implement X").
+  - Not approval: a question ("what about X?"), a spec marked `Ready`, approval of a different item, or feedback on previous work ("this looks small") — summarise the change and ask.
+  - No approval needed for small supporting changes (adding a sprite, writing tests, backlog status updates, config/skill edits) or read-only work (reading code, running analyze/tests, diagnosing).
 - Prefer the smallest change that solves the request; match existing code patterns. No drive-by refactors.
 - Delete superseded code instead of commenting it out — git keeps history.
 - Game state transitions (start, pause, resume, countdown, game over, main menu, reset) go through methods on `FlappyActionGame`. Add a method there rather than manipulating `overlays` or the engine from elsewhere.
