@@ -59,7 +59,7 @@ There is no CI. `flutter analyze` + `flutter test` are the local gate.
 | New menu / screen overlay | Skill `add-overlay` |
 | Tests | Skill `write-tests` |
 | Checks + commit message + PR description | `/prepare-pr` |
-| Post-change verification | Subagent `verifier` (readonly) |
+| Post-change verification | Subagent `verifier` (runs checks, never edits) |
 | Diff review | Subagent `code-reviewer` (readonly) |
 | Broad codebase search | Built-in Explore subagent |
 
