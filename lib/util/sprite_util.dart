@@ -69,6 +69,33 @@ class SpriteUtil {
     }
   }
 
+  static Sprite getSmallDigitSprite(int digit) {
+    switch (digit) {
+      case 0:
+        return smallDigit0;
+      case 1:
+        return smallDigit1;
+      case 2:
+        return smallDigit2;
+      case 3:
+        return smallDigit3;
+      case 4:
+        return smallDigit4;
+      case 5:
+        return smallDigit5;
+      case 6:
+        return smallDigit6;
+      case 7:
+        return smallDigit7;
+      case 8:
+        return smallDigit8;
+      case 9:
+        return smallDigit9;
+      default:
+        return smallDigit0;
+    }
+  }
+
   // MENU SPRITES
   static Sprite playButton = getSprite(354, 118, 52, 29);
   static Sprite flappyBirdText = getSprite(351, 91, 89, 24);
