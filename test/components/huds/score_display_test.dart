@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame_test/flame_test.dart';
@@ -6,6 +7,21 @@ import 'package:flappy_action/components/huds/score_display.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// Increments from inside `update`, like the real per-second timer does, so
+/// tests can make pops overlap.
+class _IncrementOnUpdateScoreDisplay extends ScoreDisplay {
+  bool incrementOnNextUpdate = false;
+
+  @override
+  void update(double dt) {
+    if (incrementOnNextUpdate) {
+      incrementOnNextUpdate = false;
+      incrementScore();
+    }
+    super.update(dt);
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +39,14 @@ void main() {
 
   List<SpriteComponent> digitChildren(ScoreDisplay scoreDisplay) =>
       scoreDisplay.children.whereType<SpriteComponent>().toList();
+
+  List<ScaleEffect> scaleEffects(ScoreDisplay scoreDisplay) =>
+      scoreDisplay.children.whereType<ScaleEffect>().toList();
+
+  Future<void> increment(FlameGame game, ScoreDisplay scoreDisplay) async {
+    scoreDisplay.incrementScore();
+    await game.ready();
+  }
 
   group('ScoreDisplay', () {
     testWithFlameGame('renders one digit sprite per digit', (game) async {
@@ -89,6 +113,83 @@ void main() {
 
       game.update(0.5);
       expect(scoreDisplay.score, 1);
+    });
+  });
+
+  group('ScoreDisplay pop', () {
+    testWithFlameGame('does not pop when first shown', (game) async {
+      final scoreDisplay = await addScoreDisplay(game);
+
+      expect(scaleEffects(scoreDisplay), isEmpty);
+      expect(scoreDisplay.scale, Vector2.all(1));
+    });
+
+    testWithFlameGame('pops when the score increments', (game) async {
+      final scoreDisplay = await addScoreDisplay(game);
+
+      await increment(game, scoreDisplay);
+
+      expect(scaleEffects(scoreDisplay), hasLength(1));
+      game.update(0.075);
+      expect(scoreDisplay.scale.x, closeTo(1.1, 1e-3));
+    });
+
+    testWithFlameGame('pulses bigger every 10 points', (game) async {
+      final scoreDisplay = await addScoreDisplay(game, score: 9);
+
+      await increment(game, scoreDisplay);
+
+      game.update(0.125);
+      expect(scoreDisplay.scale.x, closeTo(1.3, 1e-3));
+    });
+
+    testWithFlameGame('settles back to normal size', (game) async {
+      final scoreDisplay = await addScoreDisplay(game, score: 9);
+
+      await increment(game, scoreDisplay);
+      game.update(0.3);
+      await game.ready();
+
+      expect(scoreDisplay.scale.x, closeTo(1, 1e-6));
+      expect(scoreDisplay.scale.y, closeTo(1, 1e-6));
+      expect(scaleEffects(scoreDisplay), isEmpty);
+    });
+
+    testWithFlameGame('overlapping pops do not stack', (game) async {
+      final scoreDisplay = await addScoreDisplay(game);
+
+      await increment(game, scoreDisplay);
+      game.update(0.05);
+      await increment(game, scoreDisplay);
+
+      expect(scaleEffects(scoreDisplay), hasLength(1));
+
+      game.update(0.075);
+      expect(scoreDisplay.scale.x, closeTo(1.1, 1e-3));
+
+      game.update(0.3);
+      await game.ready();
+      expect(scoreDisplay.scale.x, closeTo(1, 1e-6));
+      expect(scaleEffects(scoreDisplay), isEmpty);
+    });
+
+    testWithFlameGame('overlapping pops from update do not drift', (
+      game,
+    ) async {
+      final scoreDisplay = _IncrementOnUpdateScoreDisplay();
+      await game.ensureAdd(scoreDisplay);
+
+      for (var i = 0; i < 5; i++) {
+        scoreDisplay.incrementOnNextUpdate = true;
+        game.update(0.05);
+      }
+      game.update(0.3);
+      game.update(0.3);
+      await game.ready();
+
+      expect(scoreDisplay.score, 5);
+      expect(scoreDisplay.scale.x, closeTo(1, 1e-6));
+      expect(scoreDisplay.scale.y, closeTo(1, 1e-6));
     });
   });
 }

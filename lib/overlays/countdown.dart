@@ -13,13 +13,35 @@ class CountdownOverlay extends StatefulWidget {
   State<CountdownOverlay> createState() => _CountdownOverlayState();
 }
 
-class _CountdownOverlayState extends State<CountdownOverlay> {
+class _CountdownOverlayState extends State<CountdownOverlay>
+    with SingleTickerProviderStateMixin {
   int countdown = 3;
   Timer? _timer;
+
+  // The engine is paused during the countdown, so these are Flutter
+  // animations rather than Flame effects
+  static const Duration _numberTransition = Duration(milliseconds: 300);
+  static const double _numberStartScale = 2.0;
+  static const double _numberHeight = 2.0; // grid units
+  // Incoming numbers are fully visible after this fraction of the transition,
+  // so the shrink from the start scale can be seen
+  static const double _fadeInPortion = 0.15;
+  static const Duration _bobHalfPeriod = Duration(milliseconds: 500);
+  static const double _bobDistance = 0.1; // grid units
+  late final AnimationController _bobController;
+
+  // AnimatedSwitcher doesn't animate its first child, so show a placeholder
+  // for one frame and let the first number arrive as a change
+  bool _showNumber = false;
 
   @override
   void initState() {
     super.initState();
+    _bobController = AnimationController(vsync: this, duration: _bobHalfPeriod)
+      ..repeat(reverse: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _showNumber = true);
+    });
     _startCountdown();
   }
 
@@ -39,6 +61,7 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
   @override
   void dispose() {
     _timer?.cancel();
+    _bobController.dispose();
     super.dispose();
   }
 
@@ -65,24 +88,37 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Ready text
-                      SizedBox(
-                        width: gridX * 4,
-                        height: gridY * 1,
-                        child: SpriteWidget(sprite: SpriteUtil.readyText),
+                      // Ready text, bobbing up and down
+                      AnimatedBuilder(
+                        animation: _bobController,
+                        builder: (context, child) => Transform.translate(
+                          offset: Offset(
+                            0,
+                            (_bobController.value * 2 - 1) *
+                                gridY *
+                                _bobDistance,
+                          ),
+                          child: child,
+                        ),
+                        child: SizedBox(
+                          width: gridX * 4,
+                          height: gridY * 1,
+                          child: SpriteWidget(sprite: SpriteUtil.readyText),
+                        ),
                       ),
 
                       SizedBox(height: gridY * 0.5),
 
-                      // Countdown number
+                      // Countdown number, punching in as it changes
                       SizedBox(
-                        width: gridX,
-                        height: gridY,
-                        child: countdown > 0
-                            ? SpriteWidget(
-                                sprite: _getCountdownSprite(countdown),
-                              )
-                            : const SizedBox(),
+                        height: gridY * _numberHeight,
+                        child: AnimatedSwitcher(
+                          duration: _numberTransition,
+                          transitionBuilder: _punchIn,
+                          child: _showNumber && countdown > 0
+                              ? _number(countdown, gridY * _numberHeight)
+                              : const SizedBox(key: ValueKey(0)),
+                        ),
                       ),
                     ],
                   ),
@@ -92,6 +128,44 @@ class _CountdownOverlayState extends State<CountdownOverlay> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Incoming numbers scale down from [_numberStartScale] with an overshoot
+  /// while quickly fading in; outgoing numbers only fade out. AnimatedSwitcher runs
+  /// the same transition in reverse for outgoing children, so the scale is
+  /// chosen from the animation's direction on every frame.
+  Widget _punchIn(Widget child, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final isLeaving = animation.status == AnimationStatus.reverse;
+        final scale = isLeaving
+            ? 1.0
+            : _numberStartScale +
+                  (1.0 - _numberStartScale) *
+                      Curves.easeOutBack.transform(animation.value);
+        final opacity = isLeaving
+            ? animation.value
+            : (animation.value / _fadeInPortion).clamp(0.0, 1.0);
+        return Opacity(
+          opacity: opacity,
+          child: Transform.scale(scale: scale, child: child),
+        );
+      },
+    );
+  }
+
+  /// Sized from the sprite's own aspect ratio so every number has the same
+  /// height (the '1' is narrower than the other digits).
+  Widget _number(int value, double height) {
+    final sprite = _getCountdownSprite(value);
+    return SizedBox(
+      key: ValueKey(value),
+      height: height,
+      width: height * sprite.srcSize.x / sprite.srcSize.y,
+      child: SpriteWidget(sprite: sprite),
     );
   }
 
