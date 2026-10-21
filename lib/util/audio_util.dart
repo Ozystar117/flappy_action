@@ -3,6 +3,43 @@ import 'dart:async';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
 
+/// Plays one looping music track at a time.
+abstract class MusicPlayer {
+  void play(String file, double volume);
+  void pause();
+  void resume();
+  void stop();
+}
+
+class _FlameMusicPlayer implements MusicPlayer {
+  // Each FlameAudio.bgm call is several awaited steps; queue them so a pause
+  // can't land in the middle of a play that is still starting
+  Future<void> _queue = Future.value();
+
+  @override
+  void play(String file, double volume) =>
+      _enqueue(() => FlameAudio.bgm.play(file, volume: volume));
+
+  @override
+  void pause() => _enqueue(FlameAudio.bgm.pause);
+
+  @override
+  void resume() => _enqueue(FlameAudio.bgm.resume);
+
+  @override
+  void stop() => _enqueue(FlameAudio.bgm.stop);
+
+  void _enqueue(Future<void> Function() action) {
+    _queue = _queue.then((_) async {
+      try {
+        await action();
+      } catch (error) {
+        debugPrint('Music error: $error');
+      }
+    });
+  }
+}
+
 class AudioUtil {
   static const String _flap = 'flap.wav';
   static const String _kill = 'enemy_kill.wav';
@@ -10,6 +47,8 @@ class AudioUtil {
   static const String _death = 'player_death.wav';
   static const String _countdownGo = 'countdown_go.wav';
   static const List<int> _countdownNumbers = [3, 2, 1];
+  static const String _menuMusic = 'menu.m4a';
+  static const String _gameMusic = 'background.m4a';
 
   static const double _flapVolume = 0.5;
   static const double _killVolume = 0.8;
@@ -17,6 +56,7 @@ class AudioUtil {
   static const double _deathVolume = 0.8;
   static const double _countdownVolume = 0.6;
   static const double _countdownGoVolume = 0.8;
+  static const double _musicVolume = 0.25;
 
   // Ambient on iOS: silenced by the silent switch and mixes with music from
   // other apps instead of stopping it
@@ -36,6 +76,18 @@ class AudioUtil {
   static set player(void Function(String file, double volume)? player) =>
       _player = player;
 
+  // Null until load() completes, like _player
+  static MusicPlayer? _music;
+  static String? _currentMusic;
+  static bool _musicPaused = false;
+
+  @visibleForTesting
+  static set music(MusicPlayer? music) {
+    _music = music;
+    _currentMusic = null;
+    _musicPaused = false;
+  }
+
   // Longest wait for a sound to finish before its player is disposed anyway
   static const Duration _maxSoundLength = Duration(seconds: 2);
 
@@ -48,12 +100,53 @@ class AudioUtil {
         _death,
         for (final number in _countdownNumbers) _countdownFile(number),
         _countdownGo,
+        _menuMusic,
+        _gameMusic,
       ]);
+      await FlameAudio.bgm.initialize(audioContext: _audioContext);
       _player = _playWithFlameAudio;
+      _music = _FlameMusicPlayer();
     } catch (error) {
       // Sound is polish; stay silent rather than stop the game from loading
       debugPrint('Sound effects disabled: $error');
     }
+  }
+
+  static void playMenuMusic() => _playMusic(_menuMusic);
+
+  /// Resumes the game track if it was paused, otherwise starts it over.
+  static void playGameMusic() {
+    final music = _music;
+    if (music == null) return;
+    if (_currentMusic == _gameMusic && _musicPaused) {
+      _musicPaused = false;
+      music.resume();
+    } else {
+      _playMusic(_gameMusic);
+    }
+  }
+
+  static void pauseMusic() {
+    final music = _music;
+    if (music == null || _currentMusic == null || _musicPaused) return;
+    _musicPaused = true;
+    music.pause();
+  }
+
+  static void stopMusic() {
+    final music = _music;
+    if (music == null || _currentMusic == null) return;
+    _currentMusic = null;
+    _musicPaused = false;
+    music.stop();
+  }
+
+  static void _playMusic(String file) {
+    final music = _music;
+    if (music == null) return;
+    _currentMusic = file;
+    _musicPaused = false;
+    music.play(file, _musicVolume);
   }
 
   static void flap() => _play(_flap, _flapVolume);

@@ -20,7 +20,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s.
-- **Audio:** sound effects for flap (also on the main menu Start and pause menu Resume taps), enemy kill, death (hit, then death sound 0.4 s later), and the countdown (a beep on 3, 2, 1, then "go") via `AudioUtil` and `flame_audio`. They respect the silent switch and mix with other apps' music. No music.
+- **Audio:** sound effects for flap (also on the main menu Start and pause menu Resume taps), enemy kill, death (hit, then death sound 0.4 s later), and the countdown (a beep on 3, 2, 1, then "go") via `AudioUtil` and `flame_audio`. Music at volume 0.25: `menu.m4a` loops on the main menu; `background.m4a` starts when the countdown completes, pauses with the pause menu (continuing after the resume countdown), and stops at game over. Everything respects the silent switch and mixes with other apps' music.
 
 ## Known gaps and tech debt
 
@@ -30,6 +30,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - `isGameOver` / `isGameStarted` on `FlappyActionGame` are never updated.
 - `startGame` uses `Future.delayed` for timing.
 - Possible bug (unconfirmed): pausing while the countdown is showing. The countdown's Flutter timer keeps running under the pause menu and `countdownComplete()` would resume the engine; `resumeGame()` then re-adds an already-active `countdown` overlay. Check whether the pause button is tappable through the countdown overlay.
+- Possible bug (unconfirmed): backgrounding the app during the countdown. Its Dart timer keeps running, so `countdownComplete()` resumes the engine and starts the game music while the app is in the background (Android may play it; iOS may come back silent until the next transition).
 - Possible bug (unconfirmed): nothing stops the bird flying above the screen, and top pipes start at `y = 0`, so the player may be able to sit above the pipes indefinitely.
 - Leftover commented-out code in overlays, `PauseButton`, and `FlappyActionGame`.
 - `assets/images/spritesheet.png` is WebP data with a `.png` extension. Flutter decodes it fine; macOS `sips` needs `-s format png` before cropping.
@@ -47,7 +48,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Combat hit ticks | Idea | | | | | | | S, after core SFX. Tick when a bullet hits an enemy. No per-shot sound at 20 shots/s (or throttle to ~4/s) |
 | Countdown beeps | Done | | | | | | | `countdown_3/2/1.wav` on each number, `countdown_go.wav` when play resumes; played from the countdown overlay (works while the engine is paused) |
 | Milestone chime | Idea | | | | | | | S. Chime with the every-10 pulse (not every +1) |
-| Background music | Ready | 3 | 4 | 3 | 3 | 5 | Build now | See [spec](#background-music). Human supplied `menu.wav` and `background.wav` (~1 min loops, 19 MB as WAV, ~1.7 MB as AAC). Uses `FlameAudio.bgm`; must follow pause, game over, and main menu |
+| Background music | Done | 3 | 4 | 3 | 3 | 5 | Build now | See [spec](#background-music). Human supplied `menu.wav` and `background.wav` (~1 min loops, 19 MB as WAV, ~1.7 MB as AAC). Uses `FlameAudio.bgm`; must follow pause, game over, and main menu |
 | Mute toggle | Idea | | | | | | | S–M, after background music. Needs a button (on the spritesheet?) and `shared_preferences` to persist |
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |

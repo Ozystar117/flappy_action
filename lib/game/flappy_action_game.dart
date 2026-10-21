@@ -44,6 +44,7 @@ class FlappyActionGame extends FlameGame
   void onLoad() async {
     await images.loadAll([SpriteUtil.spriteSheet]);
     await AudioUtil.load();
+    AudioUtil.playMenuMusic();
     Flame.device.setPortraitUpOnly(); // lock to portrait
     GameUtil.initialize(deviceSize: size);
 
@@ -105,6 +106,7 @@ class FlappyActionGame extends FlameGame
     // A pipe and the ground can both end the run in the same frame; only the
     // call that actually shows the menu plays the sounds
     if (overlays.add('gameOverMenu')) {
+      AudioUtil.stopMusic();
       AudioUtil.hit();
       _deathSoundTimer = Timer(_deathSoundDelay, AudioUtil.die);
     }
@@ -112,6 +114,7 @@ class FlappyActionGame extends FlameGame
   }
 
   Future<void> startGame() async {
+    AudioUtil.stopMusic();
     overlays.clear();
     resumeEngine();
     addComponentsToWorld();
@@ -139,9 +142,11 @@ class FlappyActionGame extends FlameGame
   void countdownComplete() {
     overlays.remove('countdown');
     resumeEngine();
+    AudioUtil.playGameMusic();
   }
 
   void pauseGame() {
+    AudioUtil.pauseMusic();
     overlays.add('pauseMenu');
     pauseEngine();
   }
@@ -156,6 +161,7 @@ class FlappyActionGame extends FlameGame
     overlays.clear();
     overlays.add('mainMenu');
     reset();
+    AudioUtil.playMenuMusic();
     pauseEngine();
   }
 
