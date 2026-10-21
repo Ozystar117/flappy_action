@@ -7,6 +7,7 @@ import 'package:flappy_action/components/birds/enemy.dart';
 import 'package:flappy_action/components/bullet.dart';
 import 'package:flappy_action/components/obstacles/pipe.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 
@@ -77,6 +78,9 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
 
   void jump() {
     velocity.y = -GameUtil.getRelativeHeight(1.5);
+    if (!game.paused) {
+      AudioUtil.flap();
+    }
   }
 
   void shoot() {

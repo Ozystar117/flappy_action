@@ -10,6 +10,7 @@ import 'package:flappy_action/components/bullet.dart';
 import 'package:flappy_action/components/huds/score_display.dart';
 import 'package:flappy_action/components/score_popup.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -114,6 +115,22 @@ void main() {
     expect(game.children.whereType<ScorePopup>(), hasLength(1));
     expect(enemy.children.whereType<ScaleEffect>(), hasLength(1));
     expect(enemy.children.whereType<OpacityEffect>(), hasLength(1));
+  });
+
+  testWithGame<_TestGame>('plays the kill sound once', _TestGame.new, (
+    game,
+  ) async {
+    final played = <String>[];
+    AudioUtil.player = (file, volume) => played.add(file);
+    addTearDown(() => AudioUtil.player = null);
+    final enemy = await addEnemy(game);
+
+    await hit(game, enemy);
+    expect(played, isEmpty);
+
+    await hit(game, enemy);
+    await hit(game, enemy);
+    expect(played, ['enemy_kill.wav']);
   });
 
   testWithGame<_TestGame>(

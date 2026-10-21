@@ -19,7 +19,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
 - **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
-- **Visuals:** background cycles day/night every 30 s. No audio.
+- **Visuals:** background cycles day/night every 30 s.
+- **Audio:** sound effects for flap, enemy kill, and death (hit, then death sound 0.4 s later) via `AudioUtil` and `flame_audio`. They respect the silent switch and mix with other apps' music. No music.
 
 ## Known gaps and tech debt
 
@@ -42,7 +43,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Enemy death effect | Done | 5 | 4 | 5 | 4 | 5 | Build now | See [spec](#enemy-death-pop--kill-reward) |
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
-| Core sound effects (flap, kill, death) | Ready | 4 | 5 | 3 | 4 | 4 | Build now | See [spec](#core-sound-effects-flap-kill-death). Blocked on the human supplying 4 CC0 files in `assets/audio/` |
+| Core sound effects (flap, kill, death) | Done | 4 | 5 | 3 | 4 | 4 | Build now | See [spec](#core-sound-effects-flap-kill-death). `assets/audio/shoot.wav` is included but unused (for combat ticks) |
 | Combat hit ticks | Idea | | | | | | | S, after core SFX. Tick when a bullet hits an enemy. No per-shot sound at 20 shots/s (or throttle to ~4/s) |
 | Milestone chime + countdown beeps | Idea | | | | | | | S, after core SFX. Chime with the every-10 pulse (not every +1). 3-2-1 beeps + "go" from the countdown overlay (works while the engine is paused) |
 | Background music + mute | Idea | | | | | | | M, not yet. Must stop/resume with pause and game over; mute toggle, ideally persisted (`shared_preferences`) |
@@ -71,7 +72,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 **Design**
 - `pubspec.yaml`: add `flame_audio: ">=2.11.0 <2.12.0"` (the latest version forces Flame 1.38) and the `assets/audio/` folder. Flutter's automatic `ios/` plugin changes get their own commit.
-- Assets (human-supplied, CC0): `assets/audio/flap`, `kill`, `hit`, `die` as short `.wav` or `.mp3` files.
+- Assets (human-supplied, CC0): `assets/audio/flap.wav`, `enemy_kill.wav`, `player_hit.wav`, `player_death.wav`.
 - New `lib/util/audio_util.dart` — `AudioUtil`, modelled on `SpriteUtil`:
   - `static Future<void> load()` preloads the four files and configures the audio session (respect silence, mix with others). Called from `FlappyActionGame.onLoad` after the spritesheet loads.
   - `flap()`, `kill()`, `hit()`, `die()` play at set volumes (start at flap 0.5, kill 0.8, hit 1.0, die 0.8).
