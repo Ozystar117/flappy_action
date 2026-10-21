@@ -42,7 +42,10 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Enemy death effect | Done | 5 | 4 | 5 | 4 | 5 | Build now | See [spec](#enemy-death-pop--kill-reward) |
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
-| Sound effects | Idea | | | | | | | Needs `flame_audio` and assets |
+| Core sound effects (flap, kill, death) | Ready | 4 | 5 | 3 | 4 | 4 | Build now | See [spec](#core-sound-effects-flap-kill-death). Blocked on the human supplying 4 CC0 files in `assets/audio/` |
+| Combat hit ticks | Idea | | | | | | | S, after core SFX. Tick when a bullet hits an enemy. No per-shot sound at 20 shots/s (or throttle to ~4/s) |
+| Milestone chime + countdown beeps | Idea | | | | | | | S, after core SFX. Chime with the every-10 pulse (not every +1). 3-2-1 beeps + "go" from the countdown overlay (works while the engine is paused) |
+| Background music + mute | Idea | | | | | | | M, not yet. Must stop/resume with pause and game over; mute toggle, ideally persisted (`shared_preferences`) |
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
 | Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
@@ -52,6 +55,53 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Game-over score tally | Idea | | | | | | | L. Count-up + NEW badge/medals. Needs a game-over score panel first; pairs with persistent high score |
 
 ## Specs
+
+### Core sound effects (flap, kill, death)
+
+**Goal:** the game sounds alive — every flap whooshes, every kill pops, and dying lands with a thud.
+
+**Acceptance criteria**
+- [ ] A flap sound plays on every tap that makes the bird jump during play — not on menus, during the countdown, or while paused.
+- [ ] A kill sound plays exactly once when an enemy dies, together with the "+5". Hits on a dying enemy play nothing.
+- [ ] A hit sound plays the moment the run ends, followed by a "die" sound 0.4 s later — once per death, even if the bird touches a pipe and the ground in the same frame.
+- [ ] Sounds respect the iPhone silent switch and mix with the player's own music instead of stopping it.
+- [ ] Sounds are preloaded at startup, so the first flap has no noticeable delay.
+- [ ] No sound plays in tests, and all existing tests pass unchanged.
+- [ ] Gameplay, timing, and visuals are unchanged.
+
+**Design**
+- `pubspec.yaml`: add `flame_audio: ">=2.11.0 <2.12.0"` (the latest version forces Flame 1.38) and the `assets/audio/` folder. Flutter's automatic `ios/` plugin changes get their own commit.
+- Assets (human-supplied, CC0): `assets/audio/flap`, `kill`, `hit`, `die` as short `.wav` or `.mp3` files.
+- New `lib/util/audio_util.dart` — `AudioUtil`, modelled on `SpriteUtil`:
+  - `static Future<void> load()` preloads the four files and configures the audio session (respect silence, mix with others). Called from `FlappyActionGame.onLoad` after the spritesheet loads.
+  - `flap()`, `kill()`, `hit()`, `die()` play at set volumes (start at flap 0.5, kill 0.8, hit 1.0, die 0.8).
+  - Every play call is a no-op until `load()` completes. Test games never call it, so tests stay silent.
+  - Playback goes through a replaceable static function so tests can swap in a recorder.
+- Call sites:
+  - `FlappyBird.jump()` → `AudioUtil.flap()`, only when the game isn't paused.
+  - `Enemy._die()` → `AudioUtil.kill()`.
+  - `FlappyActionGame.gameOver()` → `hit()`, then `die()` after 0.4 s, only when the game-over overlay was actually just added (so double collisions play once).
+- No new game states, overlays, or sprites.
+
+**Testable logic**
+- `AudioUtil`: play calls before `load()` record nothing and don't throw.
+- With a recorder swapped in and marked loaded:
+  - A killing hit records `kill` once; further hits on the dying enemy record nothing.
+  - `jump()` records `flap` while running and nothing while paused.
+  - Calling `gameOver()` twice records `hit` once.
+
+**Manual simulator checklist** (use a real iPhone to test the silent switch)
+1. Tap to flap during play → a whoosh on every tap. Tapping on the main menu or during the countdown → no flap sound.
+2. Shoot an enemy dead → one pop, in time with the "+5".
+3. Crash into a pipe → a thud, then the "die" sound as the game-over screen appears. Same when hitting the ground.
+4. Restart quickly after dying → nothing stacks or loops.
+5. Silent switch on → no sound. Play music in another app, then open the game → the music keeps playing under the effects.
+6. Pause and resume → no unexpected sounds.
+
+**Out of scope**
+- Combat hit ticks, milestone chime, countdown beeps, background music, mute button (separate backlog ideas).
+- Volume settings.
+- Pooling or latency tuning — only if the flap sounds laggy on a device.
 
 ### Enemy death pop + kill reward
 
@@ -234,6 +284,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 ## Decisions log
 
 _Newest first. One line per decision: date, idea, verdict, reason._
+
+- 2026-10-21 — Core sound effects (flap, kill, death) — Build now — biggest "game feel" gain per line of code, felt every tap; sets up the audio plumbing later sounds reuse. Needs the human to supply CC0 assets.
 
 - 2026-10-20 — Enemy death effect + kill reward — Build now — combat is the game's hook but currently has no payoff; small, low-risk, reuses the score pop.
 
