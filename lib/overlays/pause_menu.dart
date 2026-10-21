@@ -1,5 +1,6 @@
 import 'package:flame/widgets.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 
@@ -35,6 +36,7 @@ class PauseMenu extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () {
                         // Resume the game
+                        AudioUtil.flap();
                         game.resumeGame();
                         // game.overlays.remove('pauseMenu');
                         // game.countdown();

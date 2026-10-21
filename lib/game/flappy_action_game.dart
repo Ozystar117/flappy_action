@@ -1,4 +1,6 @@
-import 'package:flame/components.dart';
+import 'dart:async';
+
+import 'package:flame/components.dart' hide Timer;
 import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
@@ -8,6 +10,7 @@ import 'package:flappy_action/components/birds/flappy_bird.dart';
 import 'package:flappy_action/components/huds/pause_button.dart';
 import 'package:flappy_action/components/obstacles/pipe_spawner.dart';
 import 'package:flappy_action/components/huds/score_display.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/gameUtil.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +36,15 @@ class FlappyActionGame extends FlameGame
   bool isGameOver = false;
   bool isGameStarted = false;
 
+  static const Duration _deathSoundDelay = Duration(milliseconds: 400);
+  // A Dart timer because the engine is paused at game over
+  Timer? _deathSoundTimer;
+
   @override
   void onLoad() async {
     await images.loadAll([SpriteUtil.spriteSheet]);
+    await AudioUtil.load();
+    AudioUtil.playMenuMusic();
     Flame.device.setPortraitUpOnly(); // lock to portrait
     GameUtil.initialize(deviceSize: size);
 
@@ -94,11 +103,18 @@ class FlappyActionGame extends FlameGame
   }
 
   void gameOver() {
-    overlays.add('gameOverMenu'); // todo: add game over screen
+    // A pipe and the ground can both end the run in the same frame; only the
+    // call that actually shows the menu plays the sounds
+    if (overlays.add('gameOverMenu')) {
+      AudioUtil.stopMusic();
+      AudioUtil.hit();
+      _deathSoundTimer = Timer(_deathSoundDelay, AudioUtil.die);
+    }
     pauseEngine();
   }
 
   Future<void> startGame() async {
+    AudioUtil.stopMusic();
     overlays.clear();
     resumeEngine();
     addComponentsToWorld();
@@ -113,6 +129,7 @@ class FlappyActionGame extends FlameGame
   }
 
   void reset() {
+    _deathSoundTimer?.cancel();
     world.removeAll(world.children);
     cameraComponent.viewport.removeAll(cameraComponent.viewport.children);
   }
@@ -125,9 +142,11 @@ class FlappyActionGame extends FlameGame
   void countdownComplete() {
     overlays.remove('countdown');
     resumeEngine();
+    AudioUtil.playGameMusic();
   }
 
   void pauseGame() {
+    AudioUtil.pauseMusic();
     overlays.add('pauseMenu');
     pauseEngine();
   }
@@ -142,6 +161,7 @@ class FlappyActionGame extends FlameGame
     overlays.clear();
     overlays.add('mainMenu');
     reset();
+    AudioUtil.playMenuMusic();
     pauseEngine();
   }
 

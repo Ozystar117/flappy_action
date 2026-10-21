@@ -8,6 +8,7 @@ import 'package:flappy_action/components/birds/bird.dart';
 import 'package:flappy_action/components/bullet.dart';
 import 'package:flappy_action/components/score_popup.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 
 class Enemy extends Bird with HasGameReference<FlappyActionGame> {
@@ -69,6 +70,7 @@ class Enemy extends Bird with HasGameReference<FlappyActionGame> {
     removeAll(children.whereType<CircleHitbox>());
 
     game.scoreDisplay.addPoints(killPoints);
+    AudioUtil.kill();
     parent?.add(ScorePopup(points: killPoints, position: position.clone()));
 
     // Fade only at the end so the spin and shrink stay visible.

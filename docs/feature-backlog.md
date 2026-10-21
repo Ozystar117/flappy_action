@@ -19,7 +19,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
 - **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
-- **Visuals:** background cycles day/night every 30 s. No audio.
+- **Visuals:** background cycles day/night every 30 s.
+- **Audio:** sound effects for flap (also on the main menu Start and pause menu Resume taps), enemy kill, death (hit, then death sound 0.4 s later), and the countdown (a beep on 3, 2, 1, then "go") via `AudioUtil` and `flame_audio`. Music at volume 0.25: `menu.m4a` loops on the main menu; `background.m4a` starts when the countdown completes, pauses with the pause menu (continuing after the resume countdown), and stops at game over. Everything respects the silent switch and mixes with other apps' music.
 
 ## Known gaps and tech debt
 
@@ -29,6 +30,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - `isGameOver` / `isGameStarted` on `FlappyActionGame` are never updated.
 - `startGame` uses `Future.delayed` for timing.
 - Possible bug (unconfirmed): pausing while the countdown is showing. The countdown's Flutter timer keeps running under the pause menu and `countdownComplete()` would resume the engine; `resumeGame()` then re-adds an already-active `countdown` overlay. Check whether the pause button is tappable through the countdown overlay.
+- Possible bug (unconfirmed): backgrounding the app during the countdown. Its Dart timer keeps running, so `countdownComplete()` resumes the engine and starts the game music while the app is in the background (Android may play it; iOS may come back silent until the next transition).
 - Possible bug (unconfirmed): nothing stops the bird flying above the screen, and top pipes start at `y = 0`, so the player may be able to sit above the pipes indefinitely.
 - Leftover commented-out code in overlays, `PauseButton`, and `FlappyActionGame`.
 - `assets/images/spritesheet.png` is WebP data with a `.png` extension. Flutter decodes it fine; macOS `sips` needs `-s format png` before cropping.
@@ -42,7 +44,12 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Enemy death effect | Done | 5 | 4 | 5 | 4 | 5 | Build now | See [spec](#enemy-death-pop--kill-reward) |
 | Persistent high score | Idea | | | | | | | Likely needs `shared_preferences` |
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
-| Sound effects | Idea | | | | | | | Needs `flame_audio` and assets |
+| Core sound effects (flap, kill, death) | Done | 4 | 5 | 3 | 4 | 4 | Build now | See [spec](#core-sound-effects-flap-kill-death). `assets/audio/shoot.wav` is included but unused (for combat ticks) |
+| Combat hit ticks | Idea | | | | | | | S, after core SFX. Tick when a bullet hits an enemy. No per-shot sound at 20 shots/s (or throttle to ~4/s) |
+| Countdown beeps | Done | | | | | | | `countdown_3/2/1.wav` on each number, `countdown_go.wav` when play resumes; played from the countdown overlay (works while the engine is paused) |
+| Milestone chime | Idea | | | | | | | S. Chime with the every-10 pulse (not every +1) |
+| Background music | Done | 3 | 4 | 3 | 3 | 5 | Build now | See [spec](#background-music). Human supplied `menu.wav` and `background.wav` (~1 min loops, 19 MB as WAV, ~1.7 MB as AAC). Uses `FlameAudio.bgm`; must follow pause, game over, and main menu |
+| Mute toggle | Idea | | | | | | | S–M, after background music. Needs a button (on the spritesheet?) and `shared_preferences` to persist |
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
 | Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
@@ -52,6 +59,100 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Game-over score tally | Idea | | | | | | | L. Count-up + NEW badge/medals. Needs a game-over score panel first; pairs with persistent high score |
 
 ## Specs
+
+### Background music
+
+**Goal:** a menu theme on the main menu and a quiet looping track during play, low enough that the sound effects stay clear.
+
+**Acceptance criteria**
+- [ ] `menu` loops on the main menu: at app launch and after returning from game over.
+- [ ] Tapping Start stops the menu track; the countdown plays with only its beeps.
+- [ ] `background` starts from the beginning when the countdown completes and loops during play.
+- [ ] Pausing pauses `background`. It stays silent through the resume countdown, then continues from the same point when that countdown completes.
+- [ ] Game over stops the music; only the existing hit and death sounds play.
+- [ ] Restart plays the countdown in silence, then `background` from the beginning.
+- [ ] Music volume is 0.25, below every sound effect (flap 0.5, others 0.6–1.0).
+- [ ] The silent switch mutes the music, and it pauses when the app goes to the background.
+
+**Design**
+- Assets: convert the human-supplied WAVs to `assets/audio/menu.m4a` and `background.m4a` (AAC, 128 kbps, ~1.7 MB total, down from 19 MB) and delete the WAVs.
+- `AudioUtil`:
+  - `load()` also preloads both tracks and initialises `FlameAudio.bgm` with the same audio context as the sound effects.
+  - New `playMenuMusic()`, `playGameMusic()` (resumes if the game track is paused, otherwise starts it from the beginning), `pauseMusic()`, `stopMusic()`.
+  - Music calls go through a replaceable hook so tests can record them, like the sound effects.
+- `FlappyActionGame` (one call in each method):
+  - `onLoad` → `playMenuMusic`.
+  - `startGame` → `stopMusic`.
+  - `countdownComplete` → `playGameMusic`.
+  - `pauseGame` → `pauseMusic`.
+  - `gameOver` → `stopMusic`, only when the game-over menu was actually just added.
+  - `goToMainMenu` → `playMenuMusic`.
+- No overlay, `main.dart`, or `pubspec.yaml` changes (`assets/audio/` is already listed).
+
+**Testable logic**
+- `AudioUtil`: music calls before `load()` do nothing and don't throw; each method maps to the right file at volume 0.25.
+- `FlappyActionGame`: each transition makes the expected music call; pause then countdown complete resumes rather than restarts; `gameOver` twice stops the music once.
+
+**Manual simulator checklist** (use a real iPhone to test the silent switch)
+1. Launch → the menu theme plays quietly.
+2. Tap Start → the menu theme stops, beeps and "go" play, then the game track starts.
+3. Flap and kill → the effects are clearly louder than the music.
+4. Pause → the music pauses. Resume → the countdown plays in silence, then the music continues from the same point.
+5. Die → the music stops and the hit and death sounds play. Restart → countdown, then the game track from the beginning.
+6. Die → Main Menu → the menu theme plays again.
+7. Play past one minute → the track loops; listen for a gap or click at the loop point.
+8. Background the app and return → the music pauses and resumes.
+9. Silent switch on → no music.
+
+**Out of scope**
+- Mute toggle (separate idea), crossfades, music on the game-over screen, silencing our music while another app plays audio.
+
+### Core sound effects (flap, kill, death)
+
+**Goal:** the game sounds alive — every flap whooshes, every kill pops, and dying lands with a thud.
+
+**Acceptance criteria**
+- [ ] A flap sound plays on every tap that makes the bird jump during play, and on the main menu Start and pause menu Resume taps — not on other menu taps, during the countdown, or while paused.
+- [ ] A kill sound plays exactly once when an enemy dies, together with the "+5". Hits on a dying enemy play nothing.
+- [ ] A hit sound plays the moment the run ends, followed by a "die" sound 0.4 s later — once per death, even if the bird touches a pipe and the ground in the same frame.
+- [ ] Sounds respect the iPhone silent switch and mix with the player's own music instead of stopping it.
+- [ ] Sounds are preloaded at startup, so the first flap has no noticeable delay.
+- [ ] No sound plays in tests, and all existing tests pass unchanged.
+- [ ] Gameplay, timing, and visuals are unchanged.
+
+**Design**
+- `pubspec.yaml`: add `flame_audio: ">=2.11.0 <2.12.0"` (the latest version forces Flame 1.38) and the `assets/audio/` folder. Flutter's automatic `ios/` plugin changes get their own commit.
+- Assets (human-supplied, CC0): `assets/audio/flap.wav`, `enemy_kill.wav`, `player_hit.wav`, `player_death.wav`.
+- New `lib/util/audio_util.dart` — `AudioUtil`, modelled on `SpriteUtil`:
+  - `static Future<void> load()` preloads the four files and configures the audio session (respect silence, mix with others). Called from `FlappyActionGame.onLoad` after the spritesheet loads.
+  - `flap()`, `kill()`, `hit()`, `die()` play at set volumes (start at flap 0.5, kill 0.8, hit 1.0, die 0.8).
+  - Every play call is a no-op until `load()` completes. Test games never call it, so tests stay silent.
+  - Playback goes through a replaceable static function so tests can swap in a recorder.
+- Call sites:
+  - `FlappyBird.jump()` → `AudioUtil.flap()`, only when the game isn't paused.
+  - `Enemy._die()` → `AudioUtil.kill()`.
+  - `FlappyActionGame.gameOver()` → `hit()`, then `die()` after 0.4 s, only when the game-over overlay was actually just added (so double collisions play once).
+- No new game states, overlays, or sprites.
+
+**Testable logic**
+- `AudioUtil`: play calls before `load()` record nothing and don't throw.
+- With a recorder swapped in and marked loaded:
+  - A killing hit records `kill` once; further hits on the dying enemy record nothing.
+  - `jump()` records `flap` while running and nothing while paused.
+  - Calling `gameOver()` twice records `hit` once.
+
+**Manual simulator checklist** (use a real iPhone to test the silent switch)
+1. Tap to flap during play → a whoosh on every tap. Tapping Start on the main menu or Resume on the pause menu → a whoosh. Tapping during the countdown → no flap sound.
+2. Shoot an enemy dead → one pop, in time with the "+5".
+3. Crash into a pipe → a thud, then the "die" sound as the game-over screen appears. Same when hitting the ground.
+4. Restart quickly after dying → nothing stacks or loops.
+5. Silent switch on → no sound. Play music in another app, then open the game → the music keeps playing under the effects.
+6. Pause and resume → no unexpected sounds.
+
+**Out of scope**
+- Combat hit ticks, milestone chime, countdown beeps, background music, mute button (separate backlog ideas).
+- Volume settings.
+- Pooling or latency tuning — only if the flap sounds laggy on a device.
 
 ### Enemy death pop + kill reward
 
@@ -234,6 +335,9 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 ## Decisions log
 
 _Newest first. One line per decision: date, idea, verdict, reason._
+
+- 2026-10-21 — Background music — Build now — assets are supplied and the audio plumbing exists; the risk is keeping music in step with every game state. Mute toggle split out as a separate idea.
+- 2026-10-21 — Core sound effects (flap, kill, death) — Build now — biggest "game feel" gain per line of code, felt every tap; sets up the audio plumbing later sounds reuse. Needs the human to supply CC0 assets.
 
 - 2026-10-20 — Enemy death effect + kill reward — Build now — combat is the game's hook but currently has no payoff; small, low-risk, reuses the score pop.
 
