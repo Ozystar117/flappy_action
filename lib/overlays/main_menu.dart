@@ -1,6 +1,7 @@
 // lib/overlays/main_menu.dart
 import 'package:flame/widgets.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 
@@ -61,6 +62,7 @@ class MainMenu extends StatelessWidget {
                           onTap: () {
                             // game.overlays.remove('mainMenu');
                             // game.resumeEngine();
+                            AudioUtil.flap();
                             game.startGame();
                           },
                           // child: SpriteWidget(sprite: SpriteUtil.playButton),

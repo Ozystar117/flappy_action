@@ -2,6 +2,7 @@ import 'package:flame/flame.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
 import 'package:flappy_action/overlays/countdown.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -123,6 +124,33 @@ void main() {
 
       await tester.pump(const Duration(seconds: 2));
       expect(game.completeCalls, 1);
+
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('beeps on each number, then plays "go" once', (tester) async {
+      final played = <String>[];
+      AudioUtil.player = (file, volume) => played.add(file);
+      addTearDown(() => AudioUtil.player = null);
+
+      await pumpCountdown(tester);
+      await tester.pump();
+      expect(played, ['countdown_3.wav']);
+
+      await tester.pump(const Duration(seconds: 1));
+      expect(played.last, 'countdown_2.wav');
+
+      await tester.pump(const Duration(seconds: 1));
+      expect(played.last, 'countdown_1.wav');
+
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 2));
+      expect(played, [
+        'countdown_3.wav',
+        'countdown_2.wav',
+        'countdown_1.wav',
+        'countdown_go.wav',
+      ]);
 
       await tester.pumpWidget(const SizedBox());
     });

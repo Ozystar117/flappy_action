@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flame/widgets.dart';
 import 'package:flappy_action/game/flappy_action_game.dart';
+import 'package:flappy_action/util/audio_util.dart';
 import 'package:flappy_action/util/sprite_util.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +41,9 @@ class _CountdownOverlayState extends State<CountdownOverlay>
     _bobController = AnimationController(vsync: this, duration: _bobHalfPeriod)
       ..repeat(reverse: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _showNumber = true);
+      if (!mounted) return;
+      setState(() => _showNumber = true);
+      AudioUtil.countdown(countdown);
     });
     _startCountdown();
   }
@@ -51,8 +54,11 @@ class _CountdownOverlayState extends State<CountdownOverlay>
         countdown--;
       });
 
-      if (countdown <= 0) {
+      if (countdown > 0) {
+        AudioUtil.countdown(countdown);
+      } else {
         timer.cancel();
+        AudioUtil.countdownGo();
         widget.game.countdownComplete();
       }
     });

@@ -8,11 +8,15 @@ class AudioUtil {
   static const String _kill = 'enemy_kill.wav';
   static const String _hit = 'player_hit.wav';
   static const String _death = 'player_death.wav';
+  static const String _countdownGo = 'countdown_go.wav';
+  static const List<int> _countdownNumbers = [3, 2, 1];
 
   static const double _flapVolume = 0.5;
   static const double _killVolume = 0.8;
   static const double _hitVolume = 1.0;
   static const double _deathVolume = 0.8;
+  static const double _countdownVolume = 0.6;
+  static const double _countdownGoVolume = 0.8;
 
   // Ambient on iOS: silenced by the silent switch and mixes with music from
   // other apps instead of stopping it
@@ -37,7 +41,14 @@ class AudioUtil {
 
   static Future<void> load() async {
     try {
-      await FlameAudio.audioCache.loadAll([_flap, _kill, _hit, _death]);
+      await FlameAudio.audioCache.loadAll([
+        _flap,
+        _kill,
+        _hit,
+        _death,
+        for (final number in _countdownNumbers) _countdownFile(number),
+        _countdownGo,
+      ]);
       _player = _playWithFlameAudio;
     } catch (error) {
       // Sound is polish; stay silent rather than stop the game from loading
@@ -49,6 +60,13 @@ class AudioUtil {
   static void kill() => _play(_kill, _killVolume);
   static void hit() => _play(_hit, _hitVolume);
   static void die() => _play(_death, _deathVolume);
+
+  /// Plays the beep for 3, 2, or 1.
+  static void countdown(int number) =>
+      _play(_countdownFile(number), _countdownVolume);
+  static void countdownGo() => _play(_countdownGo, _countdownGoVolume);
+
+  static String _countdownFile(int number) => 'countdown_$number.wav';
 
   static void _play(String file, double volume) => _player?.call(file, volume);
 

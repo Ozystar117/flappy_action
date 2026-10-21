@@ -20,7 +20,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
 - **Flow:** main menu → countdown → play → pause menu (resume with countdown) → game over (restart or main menu).
 - **Visuals:** background cycles day/night every 30 s.
-- **Audio:** sound effects for flap, enemy kill, and death (hit, then death sound 0.4 s later) via `AudioUtil` and `flame_audio`. They respect the silent switch and mix with other apps' music. No music.
+- **Audio:** sound effects for flap (also on the main menu Start and pause menu Resume taps), enemy kill, death (hit, then death sound 0.4 s later), and the countdown (a beep on 3, 2, 1, then "go") via `AudioUtil` and `flame_audio`. They respect the silent switch and mix with other apps' music. No music.
 
 ## Known gaps and tech debt
 
@@ -45,7 +45,8 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Difficulty ramp over time | Idea | | | | | | | Spawn period and speeds are constant |
 | Core sound effects (flap, kill, death) | Done | 4 | 5 | 3 | 4 | 4 | Build now | See [spec](#core-sound-effects-flap-kill-death). `assets/audio/shoot.wav` is included but unused (for combat ticks) |
 | Combat hit ticks | Idea | | | | | | | S, after core SFX. Tick when a bullet hits an enemy. No per-shot sound at 20 shots/s (or throttle to ~4/s) |
-| Milestone chime + countdown beeps | Idea | | | | | | | S, after core SFX. Chime with the every-10 pulse (not every +1). 3-2-1 beeps + "go" from the countdown overlay (works while the engine is paused) |
+| Countdown beeps | Done | | | | | | | `countdown_3/2/1.wav` on each number, `countdown_go.wav` when play resumes; played from the countdown overlay (works while the engine is paused) |
+| Milestone chime | Idea | | | | | | | S. Chime with the every-10 pulse (not every +1) |
 | Background music + mute | Idea | | | | | | | M, not yet. Must stop/resume with pause and game over; mute toggle, ideally persisted (`shared_preferences`) |
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
@@ -62,7 +63,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 **Goal:** the game sounds alive — every flap whooshes, every kill pops, and dying lands with a thud.
 
 **Acceptance criteria**
-- [ ] A flap sound plays on every tap that makes the bird jump during play — not on menus, during the countdown, or while paused.
+- [ ] A flap sound plays on every tap that makes the bird jump during play, and on the main menu Start and pause menu Resume taps — not on other menu taps, during the countdown, or while paused.
 - [ ] A kill sound plays exactly once when an enemy dies, together with the "+5". Hits on a dying enemy play nothing.
 - [ ] A hit sound plays the moment the run ends, followed by a "die" sound 0.4 s later — once per death, even if the bird touches a pipe and the ground in the same frame.
 - [ ] Sounds respect the iPhone silent switch and mix with the player's own music instead of stopping it.
@@ -92,7 +93,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
   - Calling `gameOver()` twice records `hit` once.
 
 **Manual simulator checklist** (use a real iPhone to test the silent switch)
-1. Tap to flap during play → a whoosh on every tap. Tapping on the main menu or during the countdown → no flap sound.
+1. Tap to flap during play → a whoosh on every tap. Tapping Start on the main menu or Resume on the pause menu → a whoosh. Tapping during the countdown → no flap sound.
 2. Shoot an enemy dead → one pop, in time with the "+5".
 3. Crash into a pipe → a thud, then the "die" sound as the game-over screen appears. Same when hitting the ground.
 4. Restart quickly after dying → nothing stacks or loops.

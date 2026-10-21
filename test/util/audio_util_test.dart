@@ -21,12 +21,20 @@ void main() {
     AudioUtil.kill();
     AudioUtil.hit();
     AudioUtil.die();
+    AudioUtil.countdown(3);
+    AudioUtil.countdown(2);
+    AudioUtil.countdown(1);
+    AudioUtil.countdownGo();
 
     expect(played, [
       'flap.wav',
       'enemy_kill.wav',
       'player_hit.wav',
       'player_death.wav',
+      'countdown_3.wav',
+      'countdown_2.wav',
+      'countdown_1.wav',
+      'countdown_go.wav',
     ]);
   });
 }
