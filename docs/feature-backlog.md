@@ -14,7 +14,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 
 - **Core loop:** tap to flap; gravity pulls the bird down. Hitting the ground, a pipe, or an enemy ends the run.
 - **Pipes:** a pipe pair spawns every 4 s (first one immediately) with a random gap position.
-- **Enemies:** one red bird spawns in each pipe gap; 4 HP, flashes when hit. At 0 HP it spins a full turn and shrinks over 0.5 s, fading only in the last 0.2 s (harmless while dying) and a "+5" in the tiny sprite digits floats up.
+- **Enemies:** one red bird spawns in each pipe gap, fully inside it at a random height and centred on the pipes; 4 HP, flashes when hit. At 0 HP it spins a full turn and shrinks over 0.5 s, fading only in the last 0.2 s (harmless while dying) and a "+5" in the tiny sprite digits floats up.
 - **Shooting:** the joystick aims the bird and auto-fires (20 shots/s, 2 damage per bullet).
 - **Score:** +1 per second survived and +5 per enemy kill, shown top centre with the spritesheet digits; pops on each gain and pulses bigger when crossing a multiple of 10. Passing pipes gives nothing.
 - **Countdown:** "Get Ready" bobs while 3-2-1 (non-bold `smallDigit` sprites) each punch in from 2× (2 grid units tall at rest); 3 s total.
@@ -25,7 +25,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 ## Known gaps and tech debt
 
 - `flutter analyze` reports 1 issue: `gameUtil.dart` isn't snake_case.
-- Test coverage is limited to `ScoreDisplay`, `Enemy`, `ScorePopup`, and the countdown overlay. `flame_test` is pinned to 2.0.x because 2.2.3+ requires Flame 1.36+; upgrading Flame is a separate decision.
+- Test coverage is limited to `ScoreDisplay`, `Enemy`, `FlappyBird` sounds, `PipePair` enemy placement, `ScorePopup`, `AudioUtil`, game audio/music transitions, and the countdown, main menu, and pause menu overlays. `flame_test` is pinned to 2.0.x because 2.2.3+ requires Flame 1.36+; upgrading Flame is a separate decision.
 - `pubspec.lock` is gitignored, so dependency versions aren't pinned across machines.
 - `isGameOver` / `isGameStarted` on `FlappyActionGame` are never updated.
 - `startGame` uses `Future.delayed` for timing.

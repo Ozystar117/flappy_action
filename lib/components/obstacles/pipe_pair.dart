@@ -49,7 +49,7 @@ class PipePair extends PositionComponent {
     bottomPipe.position.x = position.x;
 
     // Keep enemy in place
-    enemy.position.x = position.x;
+    enemy.position.x = _enemyX;
 
     if (topPipe.position.x < -topPipe.size.x) {
       parent!.removeAll([topPipe, bottomPipe]);
@@ -61,20 +61,25 @@ class PipePair extends PositionComponent {
   }
 
   void spawnEnemyInGap() {
+    final enemySize = GameUtil.getRelativeSizeX(0.7);
+
+    // Enemies are centre-anchored, so keep half a bird away from each pipe
+    final enemyY = randomBetween(
+      topPipe.size.y + enemySize.y / 2,
+      topPipe.size.y + gapHeight - enemySize.y / 2,
+    );
+
     enemy = Enemy(
-      size: GameUtil.getRelativeSizeX(0.7),
-      position: GameUtil.getRelativePosition(3, 3),
+      size: enemySize,
+      position: Vector2(_enemyX, enemyY),
       animationTime: 0.12,
     );
 
-    final gapCenterY = randomBetween(
-      topPipe.size.y,
-      topPipe.size.y + gapHeight,
-    );
-    enemy.position = Vector2(position.x, gapCenterY);
-
     parent!.add(enemy);
   }
+
+  // Centred on the pipes, which are anchored at their left edge
+  double get _enemyX => position.x + topPipe.size.x / 2;
 
   double randomBetween(double min, double max) {
     return min + Random().nextDouble() * (max - min);
