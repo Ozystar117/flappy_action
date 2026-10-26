@@ -44,6 +44,4 @@ class PipeSpawner extends SpawnComponent {
       period = 4;
     }
   }
-
-  // int getNumberOfSpawns() {}
 }

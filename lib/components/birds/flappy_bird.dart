@@ -15,7 +15,6 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   late final JoystickComponent joystick;
 
   late Vector2 velocity = Vector2.all(0);
-  // late Vector2 acceleration = Vector2(0, GameUtil.getRelativeHeight(10));
 
   final double gravity = GameUtil.getRelativeX(5);
 
@@ -44,9 +43,7 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   @override
   update(double dt) {
     if (position.y > GameUtil.bottom - size.y / 2) {
-      // game.isGameOver = true;
       game.gameOver();
-      // return;
     }
     velocity.y += gravity * dt;
     position.y += velocity.y * dt;
@@ -71,7 +68,6 @@ class FlappyBird extends Bird with HasGameReference<FlappyActionGame> {
   ) {
     super.onCollisionStart(intersectionPoints, other);
     if ((other is Enemy && !other.isDying) || other is Pipe) {
-      // game.isGameOver = true;
       game.gameOver();
     }
   }

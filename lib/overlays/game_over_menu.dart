@@ -47,9 +47,6 @@ class GameOverMenu extends StatelessWidget {
                         height: gridY * 1.5,
                         child: GestureDetector(
                           onTap: () {
-                            // Restart the game
-                            // game.resumeEngine();
-                            // game.overlays.remove('gameOverMenu');
                             game.restartGame();
                           },
                           child: SpriteWidget(sprite: SpriteUtil.playButton),
@@ -64,11 +61,6 @@ class GameOverMenu extends StatelessWidget {
                         height: gridY * 1,
                         child: GestureDetector(
                           onTap: () {
-                            // Go to main menu
-                            // game.overlays.remove('gameOverMenu');
-                            // game.overlays.add('mainMenu');
-                            // game.reset();
-                            // game.pauseEngine(); // prevent the game from starting when the main menu is shown
                             game.goToMainMenu();
                           },
                           child: SpriteWidget(sprite: SpriteUtil.menuButton),

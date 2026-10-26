@@ -35,11 +35,8 @@ class PauseMenu extends StatelessWidget {
                     height: gridY * 1.5, // Proportional height for play button
                     child: GestureDetector(
                       onTap: () {
-                        // Resume the game
                         AudioUtil.flap();
                         game.resumeGame();
-                        // game.overlays.remove('pauseMenu');
-                        // game.countdown();
                       },
                       child: SpriteWidget(sprite: SpriteUtil.playButton),
                     ),

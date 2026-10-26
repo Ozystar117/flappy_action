@@ -5,10 +5,9 @@ class GameUtil {
   static late Vector2 screenSize;
 
   /// Initialize the grid size based on the provided screen size
-  /// Grid will be 10% of the smaller screen dimension
+  /// Grid is 10% of each screen dimension
   static void initialize({required deviceSize}) {
     screenSize = deviceSize;
-    // grid = (screenSize.x < screenSize.y ? screenSize.x : screenSize.y) * 0.1;
     grid = screenSize * 0.1;
   }
 
