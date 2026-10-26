@@ -60,12 +60,9 @@ class MainMenu extends StatelessWidget {
                         height: gridY * 3,
                         child: GestureDetector(
                           onTap: () {
-                            // game.overlays.remove('mainMenu');
-                            // game.resumeEngine();
                             AudioUtil.flap();
                             game.startGame();
                           },
-                          // child: SpriteWidget(sprite: SpriteUtil.playButton),
                           child: SpriteWidget(sprite: SpriteUtil.tapSprite),
                         ),
                       ),

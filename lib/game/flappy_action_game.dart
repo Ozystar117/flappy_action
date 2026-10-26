@@ -74,7 +74,6 @@ class FlappyActionGame extends FlameGame
   }
 
   void addComponentsToWorld() {
-    // PipePair pipePair = PipePair(position: Vector2(size.x / 2, 0));
     player = FlappyBird(
       size: GameUtil.getRelativeSizeX(0.7),
       position: size / 2,
@@ -164,15 +163,4 @@ class FlappyActionGame extends FlameGame
     AudioUtil.playMenuMusic();
     pauseEngine();
   }
-
-  // @override
-  // void update(double dt) {
-  //   if (isGameOver) {
-  //     return;
-  //   }
-  //   super.update(dt);
-  // }
-
-  // @override
-  // bool get debugMode => true;
 }

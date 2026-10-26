@@ -32,7 +32,6 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 - Possible bug (unconfirmed): pausing while the countdown is showing. The countdown's Flutter timer keeps running under the pause menu and `countdownComplete()` would resume the engine; `resumeGame()` then re-adds an already-active `countdown` overlay. Check whether the pause button is tappable through the countdown overlay.
 - Possible bug (unconfirmed): backgrounding the app during the countdown. Its Dart timer keeps running, so `countdownComplete()` resumes the engine and starts the game music while the app is in the background (Android may play it; iOS may come back silent until the next transition).
 - Possible bug (unconfirmed): nothing stops the bird flying above the screen, and top pipes start at `y = 0`, so the player may be able to sit above the pipes indefinitely.
-- Leftover commented-out code in overlays, `PauseButton`, and `FlappyActionGame`.
 - `assets/images/spritesheet.png` is WebP data with a `.png` extension. Flutter decodes it fine; macOS `sips` needs `-s format png` before cropping.
 
 ## Ideas
@@ -52,7 +51,7 @@ Statuses: `Idea` → `Evaluated` → `Ready` (specced) → `In progress` → `Do
 | Mute toggle | Idea | | | | | | | S–M, after background music. Needs a button (on the spritesheet?) and `shared_preferences` to persist |
 | Score pop + milestone pulse | Done | 3 | 4 | 5 | 5 | 5 | Build now | See [spec](#score-pop--milestone-pulse) |
 | Countdown punch-in | Done | 3 | 3 | 5 | 4 | 5 | Build now | See [spec](#countdown-punch-in) |
-| Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob; can remove leftover commented-out code |
+| Menu entrances + pressable buttons | Idea | | | | | | | M. Title slide/bounce, shared press-scale button widget across 4 overlays, idle tap-hand bob |
 | Sprite "+5" popup | Done | | | | | | | Kill popup uses `SpriteUtil.plusSign` + `tinyDigit0–9` (0.4 grid units tall, one pixel scale for all sprites) instead of plain text |
 | Bird tilt | Idea | | | | | | | S. Nose up on flap, nose down when falling; joystick aim still overrides. `flappy_bird.dart` only |
 | Hit flash on death | Idea | | | | | | | S. White flash fading into the game-over dim, in `game_over_menu.dart` (engine is paused, so Flutter animation) |

@@ -16,7 +16,6 @@ class Pipe extends SpriteComponent {
       flipVertically();
     }
 
-    // anchor = Anchor.topLeft;
     anchor = isTop ? Anchor.topLeft : Anchor.bottomLeft;
 
     add(RectangleHitbox());
